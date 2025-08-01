@@ -50,7 +50,7 @@ class HabitCompletionView(generics.CreateAPIView):
 
 
 # Mood entry views
-class MoodListCreateVies(generics.ListCreateAPIView):
+class MoodListCreateViews(generics.ListCreateAPIView):
     serializer_class = MoodEntrySerializer
     permission_classes = [permissions.IsAuthenticated]
 
