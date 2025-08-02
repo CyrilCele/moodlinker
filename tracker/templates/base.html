@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MoodLinker | Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS (CDN) -->
+    <link href="https://cdn.jsdelivr.net/npm/[email protected]/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Chart.js (for analytics) -->
+    <script src="https://cdn.jsdelivr.net/npm/[email protected]/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <nav class="navbar navabar-expand-lg navbar-light bg-light">
+        <a href="/dashboard/" class="navbar-brand">MoodLinker</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item"><a href="/dashboard/" class="nav-link">Dashboard</a></li>
+                <li class="nav-item"><a href="/add-habits/" class="nav-link">habits</a></li>
+                <li class="nav-item"><a href="/add-mood/" class="nav-link">Mood</a></li>
+                <li class="nav-item"><a href="/view-analytics/" class="nav-link">analytics</a></li>
+            </ul>
+            <span class="navbar-text">
+                <a href="/profile/">Profile</a> | <a href="/login/">Logout</a>
+            </span>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Bootstrap JS bundle (CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/[email protected]/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

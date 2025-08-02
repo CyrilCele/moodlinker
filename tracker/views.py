@@ -7,6 +7,50 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from tracker.models import Habit, HabitCompletion, MoodEntry
 from tracker.serializers import HabitSerializer, HabitCompletionSerializer, MoodEntrySerializer, UserSerializer
 
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+
+
+def register_page(request):
+    return render(request, "register.html")
+
+
+def login_page(request):
+    return render(request, "login.html")
+
+
+@login_required
+def dashboard_page(request):
+    from datetime import date
+    from .models import Habit, MoodEntry
+    today = date.today()
+    habits = Habit.objects.filter(user=request.user)
+    mood = MoodEntry.objects.filter(user=request.user, date=today).first()
+    return render(request, "dashboard.html", {
+        "habits": habits,
+        "mood": mood
+    })
+
+
+@login_required
+def habit_entry_page(request):
+    return render(request, "habit_entry.html")
+
+
+@login_required
+def mood_entry_page(request):
+    return render(request, "mood_entry.html")
+
+
+@login_required
+def analytics_page(request):
+    return render(request, "analytics.html")
+
+
+@login_required
+def profile_page(request):
+    return render(request, "profile.html")
+
 
 # Registration view
 class RegisterView(generics.CreateAPIView):

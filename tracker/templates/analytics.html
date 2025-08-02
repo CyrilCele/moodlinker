@@ -1,0 +1,30 @@
+<!-- analytics.html -->
+{% extends "base.html" %}
+{% block content %}
+<h2>Analytics</h2>
+<canvas id="habitMoodChart" width="600" height="300"></canvas>
+<script>
+// Fetch data for chart (last 7 days)
+fetch('/api/analytics/', {
+  headers: {'Authorization': 'Bearer ' + localStorage.getItem('access')}
+})
+.then(res => res.json())
+.then(data => {
+    const labels = data.map(d => d.date);
+    const moodScores = data.map(d => d.mood);
+    const habitsDone = data.map(d => d.habits_done);
+    const ctx = document.getElementById('habitMoodChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                { label: 'Mood Score', data: moodScores, backgroundColor: 'rgba(54,162,235,0.5)' },
+                { label: 'Habits Completed', data: habitsDone, backgroundColor: 'rgba(255,99,132,0.5)' }
+            ]
+        },
+        options: { scales: { y: { beginAtZero: true } } }
+    });
+});
+</script>
+{% endblock %}

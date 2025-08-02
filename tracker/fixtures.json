@@ -1,0 +1,355 @@
+[
+  {
+    "model": "tracker.habit",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "name": "Morning Exercise",
+      "frequency": "daily"
+    }
+  },
+  {
+    "model": "tracker.habit",
+    "pk": 2,
+    "fields": {
+      "user": 1,
+      "name": "Read Book",
+      "frequency": "daily"
+    }
+  },
+  {
+    "model": "tracker.habit",
+    "pk": 3,
+    "fields": {
+      "user": 1,
+      "name": "Meditation",
+      "frequency": "daily"
+    }
+  },
+  {
+    "model": "tracker.habit",
+    "pk": 4,
+    "fields": {
+      "user": 1,
+      "name": "Drink Water",
+      "frequency": "daily"
+    }
+  },
+  {
+    "model": "tracker.habit",
+    "pk": 5,
+    "fields": {
+      "user": 1,
+      "name": "Sleep by 10PM",
+      "frequency": "daily"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 6,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-01",
+      "reflection": "Felt quite down and not very productive. I'm tired.",
+      "score": 2,
+      "emoji": "🙁"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 7,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-02",
+      "reflection": "It was a good day; I accomplished a lot and felt happy.",
+      "score": 5,
+      "emoji": "😊"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 8,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-03",
+      "reflection": "Felt quite down and not very productive. I'm tired.",
+      "score": 2,
+      "emoji": "🙁"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 9,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-04",
+      "reflection": "It was a good day; I accomplished a lot and felt happy.",
+      "score": 5,
+      "emoji": "😊"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 10,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-05",
+      "reflection": "Felt quite down and not very productive. I'm tired.",
+      "score": 2,
+      "emoji": "🙁"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 11,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-06",
+      "reflection": "It was a good day; I accomplished a lot and felt happy.",
+      "score": 5,
+      "emoji": "😊"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 12,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-07",
+      "reflection": "Felt quite down and not very productive. I'm tired.",
+      "score": 2,
+      "emoji": "🙁"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 13,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-08",
+      "reflection": "It was a good day; I accomplished a lot and felt happy.",
+      "score": 5,
+      "emoji": "😊"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 14,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-09",
+      "reflection": "Felt quite down and not very productive. I'm tired.",
+      "score": 2,
+      "emoji": "🙁"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 15,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-10",
+      "reflection": "It was a good day; I accomplished a lot and felt happy.",
+      "score": 5,
+      "emoji": "😊"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 16,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-11",
+      "reflection": "Felt quite down and not very productive. I'm tired.",
+      "score": 2,
+      "emoji": "🙁"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 17,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-12",
+      "reflection": "It was a good day; I accomplished a lot and felt happy.",
+      "score": 5,
+      "emoji": "😊"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 18,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-13",
+      "reflection": "Felt quite down and not very productive. I'm tired.",
+      "score": 2,
+      "emoji": "🙁"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 19,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-14",
+      "reflection": "It was a good day; I accomplished a lot and felt happy.",
+      "score": 5,
+      "emoji": "😊"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 20,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-15",
+      "reflection": "Felt quite down and not very productive. I'm tired.",
+      "score": 2,
+      "emoji": "🙁"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 21,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-16",
+      "reflection": "It was a good day; I accomplished a lot and felt happy.",
+      "score": 5,
+      "emoji": "😊"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 22,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-17",
+      "reflection": "Felt quite down and not very productive. I'm tired.",
+      "score": 2,
+      "emoji": "🙁"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 23,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-18",
+      "reflection": "It was a good day; I accomplished a lot and felt happy.",
+      "score": 5,
+      "emoji": "😊"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 24,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-19",
+      "reflection": "Felt quite down and not very productive. I'm tired.",
+      "score": 2,
+      "emoji": "🙁"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 25,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-20",
+      "reflection": "It was a good day; I accomplished a lot and felt happy.",
+      "score": 5,
+      "emoji": "😊"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 26,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-21",
+      "reflection": "Felt quite down and not very productive. I'm tired.",
+      "score": 2,
+      "emoji": "🙁"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 27,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-22",
+      "reflection": "It was a good day; I accomplished a lot and felt happy.",
+      "score": 5,
+      "emoji": "😊"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 28,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-23",
+      "reflection": "Felt quite down and not very productive. I'm tired.",
+      "score": 2,
+      "emoji": "🙁"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 29,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-24",
+      "reflection": "It was a good day; I accomplished a lot and felt happy.",
+      "score": 5,
+      "emoji": "😊"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 30,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-25",
+      "reflection": "Felt quite down and not very productive. I'm tired.",
+      "score": 2,
+      "emoji": "🙁"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 31,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-26",
+      "reflection": "It was a good day; I accomplished a lot and felt happy.",
+      "score": 5,
+      "emoji": "😊"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 32,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-27",
+      "reflection": "Felt quite down and not very productive. I'm tired.",
+      "score": 2,
+      "emoji": "🙁"
+    }
+  },
+  {
+    "model": "tracker.moodentry",
+    "pk": 33,
+    "fields": {
+      "user": 1,
+      "date": "2025-07-28",
+      "reflection": "It was a good day; I accomplished a lot and felt happy.",
+      "score": 5,
+      "emoji": "😊"
+    }
+  }
+]

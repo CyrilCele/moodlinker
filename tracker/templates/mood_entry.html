@@ -1,0 +1,29 @@
+<!-- mood_entry.html -->
+{% extends "base.html" %}
+{% block content %}
+<h2>New Mood Entry</h2>
+<form id="moodForm">
+  <div class="mb-3">
+    <label for="reflection" class="form-label">How do you feel?</label>
+    <textarea id="reflection" name="reflection" class="form-control" rows="4"></textarea>
+  </div>
+  <button type="submit" class="btn btn-primary">Submit Mood</button>
+</form>
+<script>
+document.getElementById('moodForm').onsubmit = function(e) {
+  e.preventDefault();
+  const data = { reflection: this.reflection.value };
+  fetch('/api/moods/', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + localStorage.getItem('access'),
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  }).then(res => res.json()).then(resp => {
+    alert('Mood entry saved with score ' + resp.score + ' ' + resp.emoji);
+    window.location.href = '/dashboard/';
+  });
+};
+</script>
+{% endblock %}

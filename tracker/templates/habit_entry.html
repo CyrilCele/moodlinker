@@ -1,0 +1,73 @@
+<!-- habit_entry.html -->
+{% extends "base.html" %}
+{% block content %}
+<h2>Your Habits</h2>
+<ul id="habitList" class="list-group mb-3"></ul>
+<button id="addHabitBtn" class="btn btn-success">Add Habit</button>
+
+<!-- Add Habit Modal -->
+<div class="modal" tabindex="-1" id="habitModal">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">New Habit</h5>
+      <button type="button" class="btn-close" onclick="closeModal()"></button>
+    </div>
+    <div class="modal-body">
+      <input id="habitName" type="text" class="form-control mb-2" placeholder="Habit name">
+      <select id="habitFreq" class="form-select">
+        <option value="daily">Daily</option><option value="weekly">Weekly</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="saveHabit()">Save</button>
+    </div>
+  </div></div>
+</div>
+
+<script>
+// Load current habits
+function loadHabits() {
+  const list = document.getElementById('habitList'); list.innerHTML = '';
+  fetch('/add-habits/', {
+    headers: {'Authorization': 'Bearer ' + localStorage.getItem('access')}
+  })
+  .then(res => res.json())
+  .then(habits => {
+    habits.forEach(h => {
+      const li = document.createElement('li');
+      li.className = 'list-group-item';
+      li.textContent = h.name + ' (' + h.frequency + ')';
+      list.appendChild(li);
+    });
+  });
+}
+loadHabits();
+
+// Add Habit button opens modal
+document.getElementById('addHabitBtn').onclick = () => {
+  document.getElementById('habitModal').style.display = 'block';
+};
+function closeModal() {
+  document.getElementById('habitModal').style.display = 'none';
+}
+function saveHabit() {
+  const name = document.getElementById('habitName').value;
+  const freq = document.getElementById('habitFreq').value;
+  fetch('/api/habits/', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + localStorage.getItem('access'),
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({name: name, frequency: freq})
+  }).then(res => {
+    if (res.status == 201) {
+      closeModal();
+      loadHabits();
+    } else {
+      res.json().then(err => alert(JSON.stringify(err)));
+    }
+  });
+}
+</script>
+{% endblock %}

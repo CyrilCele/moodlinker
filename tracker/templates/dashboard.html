@@ -1,0 +1,35 @@
+<!-- dashboard.html -->
+{% extends "base.html" %}
+{% block content %}
+<h2>Dashboard</h2>
+<p>Welcome, {{ user.username }}!</p>
+<div class="row">
+  <div class="col-md-6">
+    <h4>Today's Habits</h4>
+    <ul id="todayHabits" class="list-group">
+      <!-- Filled by JS from /api/habits/ and /api/completions/ -->
+    </ul>
+  </div>
+  <div class="col-md-6">
+    <h4>Today's Mood Entry</h4>
+    <!-- Form or link to mood entry page -->
+    <a href="/add-mood/" class="btn btn-info">Add/View Mood</a>
+  </div>
+</div>
+<script>
+// Fetch and display today's habits and completion status (placeholder code)
+fetch('/api/habits/', {
+  headers: {'Authorization': 'Bearer ' + localStorage.getItem('access')}
+})
+  .then(res => res.json())
+  .then(habits => {
+    const list = document.getElementById('todayHabits');
+    habits.forEach(habit => {
+      const li = document.createElement('li');
+      li.className = 'list-group-item d-flex justify-content-between align-items-center';
+      li.innerHTML = habit.name + ' <span class="badge bg-primary">Not Done</span>';
+      list.appendChild(li);
+    });
+  });
+</script>
+{% endblock %}
