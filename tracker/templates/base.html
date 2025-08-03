@@ -2,6 +2,25 @@
 <!doctype html>
 <html lang="en">
   <head>
+     <style>
+        .hero {
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          text-align: center;
+        }
+        .btn-primary, .btn-outline-light {
+          margin: 10px;
+          font-weight: bold;
+          font-size: 1.1rem;
+        }
+        .tagline {
+          font-size: 1.2rem;
+          margin-top: 1rem;
+          opacity: 0.9;
+        }
+    </style>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>MoodLinker</title>
@@ -12,9 +31,11 @@
     {% include "navbar.html" %}
     <div>
       {% if user.is_authenticated %}
-        <p>Signed in as <strong>{{ user.username }}</strong></p>
+        <br>
+        <p class="container">Signed in as <strong>{{ user.username }}</strong></p>
       {% else %}
-        <p>Not signed in.</p>
+        <br>
+        <p class="container">Not signed in.</p>
       {% endif %}
     </div>
     <div class="container">
