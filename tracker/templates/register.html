@@ -1,4 +1,36 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Register!</h1>
+<br>
+<h2>Register!</h2>
+{% if message %}
+    <div>{{ message }}</div>
+{% endif %}
+<div class="container">
+    <form action="{% url 'register' %}" method="post">
+        {% csrf_token %}
+        <fieldset data-bs-theme="light">
+            <div>
+                <label class="form-label mt-4">Username</label>
+                <input autofocus type="text" class="form-control" aria-describedby="username" name="username" placeholder="Enter username">
+            </div>
+            <div>
+                <label class="form-label mt-4">Email address</label>
+                <input type="email" class="form-control" aria-describedby="email" name="email" placeholder="Enter email">
+                <small class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+            <div>
+                <label class="form-label mt-4">Password</label>
+                <input name="password" type="password" class="form-control" placeholder="Enter password" autocomplete="off">
+            </div>
+            <div>
+                <label class="form-label mt-4">Confirm Password</label>
+                <input name="confirmation" type="password" class="form-control" placeholder="Confirm Password" autocomplete="off">
+            </div>
+            <br>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </fieldset>
+    </form>
+</div>
+<br>
+<p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
 {% endblock %}

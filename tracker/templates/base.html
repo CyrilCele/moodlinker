@@ -10,32 +10,40 @@
   </head>
   <body>
     {% include "navbar.html" %}
+    <div>
+      {% if user.is_authenticated %}
+        <p>Signed in as <strong>{{ user.username }}</strong></p>
+      {% else %}
+        <p>Not signed in.</p>
+      {% endif %}
+    </div>
     <div class="container">
         {% block content %}
         {% endblock %}
     </div>
+    
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const htmlElement = document.documentElement;
-            const button = document.getElementById("theme-toggle");
+      document.addEventListener("DOMContentLoaded", () => {
+        const htmlElement = document.documentElement;
+        const button = document.getElementById("theme-toggle");
 
-            // Set default theme to light
-            if (!htmlElement.hasAttribute("data-bs-theme")) {
-                htmlElement.setAttribute("data-bs-theme", "light");
-            }
+        // Set default theme to dark
+        if (!htmlElement.hasAttribute("data-bs-theme")) {
+          htmlElement.setAttribute("data-bs-theme", "dark");
+        }
 
-            // Set button text based on current theme
-            const currentTheme = htmlElement.getAttribute("data-bs-theme");
-            button.textContent = currentTheme === "dark" ? "Light" : "Dark";
+        // Set button text based on current theme
+        const currentTheme = htmlElement.getAttribute("data-bs-theme");
+        button.textContent = currentTheme === "dark" ? "Light" : "Dark";
 
-            // Toggle theme and update button text
-            button.addEventListener("click", () => {
-                const current = htmlElement.getAttribute("data-bs-theme");
-                const next = current === "dark" ? "light" : "dark";
-                htmlElement.setAttribute("data-bs-theme", next);
-                button.textContent = next === "dark" ? "Light" : "Dark";
-            });
+        // Toggle theme and update button text
+        button.addEventListener("click", () => {
+          const current = htmlElement.getAttribute("data-bs-theme");
+          const next = current === "dark" ? "light" : "dark";
+          htmlElement.setAttribute("data-bs-theme", next);
+          button.textContent = next === "dark" ? "Light" : "Dark";
         });
+      });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
   </body>
