@@ -31,6 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "admin_interface",
+    "colorfield",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -39,6 +41,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "tracker",
 ]
+
+AUTH_USER_MODEL = 'tracker.User'
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
