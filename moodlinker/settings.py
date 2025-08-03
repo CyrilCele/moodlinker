@@ -9,11 +9,11 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-import os
-# from pathlib import Path
+
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -59,7 +59,6 @@ TEMPLATES = [
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
-                "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
@@ -79,16 +78,15 @@ DATABASES = {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "moodlinker_db",
         "USER": "root",
-        "PASSWWORD": "1234",
+        "PASSWORD": "1234",
         "HOST": "127.0.0.1",
         "PORT": "3306",
         "OPTIONS": {
-            "init_command": "SET sql_mode = 'STRICT_TRANS_TABLES'"
+            "init_command": "SET sql_mode = 'STRICT_TRANS_TABLES'",
         }
     }
 }
 
-AUTH_USER_MODEL = "tracker.User"
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -114,7 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "Africa/Johannesburg"
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -129,4 +127,4 @@ STATIC_URL = "/static/"
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
-# DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
