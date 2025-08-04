@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
@@ -5,8 +7,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .forms import UserProfileForm
-from .models import User
+from .forms import UserProfileForm, MoodEntryForm
+from .models import User, MoodEntry, Habit, HabitCompletion
 
 
 def index(request):
@@ -78,4 +80,43 @@ def user_profile(request):
 
 @login_required
 def dashboard(request):
-    return render(request, "dashboard.html", {})
+    user = request.user
+    today = date.today()
+
+    # Check or create today's mood entry
+    mood_entry = MoodEntry.objects.filter(user=user, date=today).first()
+    mood_form = MoodEntryForm(request.POST or None, instance=mood_entry)
+
+    # User habits
+    habits = Habit.objects.filter(user=user)
+
+    # Create empty completion entries if they don't exist yet
+    for habit in habits:
+        HabitCompletion.objects.get_or_create(
+            user=user, habit=habit, date=today)
+
+    completions = HabitCompletion.objects.filter(user=user, date=today)
+
+    if request.method == "POST":
+        if mood_form.is_valid():
+            mood_form.instance.user = user
+            mood_form.save()
+
+        # Habit checkboxes
+        for completion in completions:
+            checkbox = request.POST.get(f"habit_{completion.habit.id}")
+            completion.completed = True if checkbox == "on" else False
+            completion.save()
+        return HttpResponseRedirect(reverse("dashboard"))
+
+    # Stats
+    total = completions.count()
+    done = completions.filter(completed=True).count()
+
+    return render(request, "dashboard.html", {
+        "mood_form": mood_form,
+        "habits": habits,
+        "completions": completions,
+        "done": done,
+        "total": total
+    })

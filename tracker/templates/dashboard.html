@@ -1,6 +1,53 @@
 {% extends "base.html" %}
+{% load custom_filters form_helpers %}
 {% block content %}
-<div class="container hero">
+<div class="container my-5 p-4 bg-dark text-light rounded shadow" style="font-family: monospace;">
+    <h5><strong>$ moodlinker</strong></h5>
+    <p>Welcome back, {{ request.user.first_name|default:request.user.username }}</p>
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="" class="form-label">🧠 Today’s Mood (1-5):</label>
+            <br>
+            <div class="btn-group" role="group">
+                {% for radio in mood_form.score %}
+                    <label class="btn btn-outline-light">
+                        {{ radio.tag }} {{ radio.choice_label }}
+                    </label>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">> Reflection:</label>
+            {{ mood_form.reflection|add_class:"form-control bg-secondary text-dark border-0" }}
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Your habits for today:</label>
+            <ul class="list-group">
+                {% for habit in habits %}
+                    {% with completions|get_item:habit.id as completion %}
+                        <li class="list-group-item bg-dark text-light d-flex justify-content-between align-items-cnter">
+                            [{{ forloop.counter }}] {{ habit.habit }}
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" name="habit_{{ habit.id }}" id="habit_{{ habit.id }}" {% if completion.completed %}checked{% endif %}>
+                            </div>
+                        </li>
+                    {% endwith %}
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="d-grit mt-4">
+            <button type="submit" class="btn btn-outline-success">Save</button>
+        </div>
+    </form>
+    <hr class="bg-secondary my-4">
+    <p>✅ {{ done }}/{{ total }} habits completed today.</p>
+    <p>📈 Mood-Habit correlation saved.</p>
+    <p>See you tomorrow!</p>
+</div>
+
+
+<!-- <div class="container hero">
     <h1 class="display-3 fw-bold">View Dashboard</h1>
     <p class="tagline">Dashboard Stats</p>
 
@@ -8,5 +55,5 @@
         <a href="#" class="btn btn-primary btn-lg">Create Habit</a>
         <a href="#" class="btn btn-light btn-lg">Log Mood</a>
     </div>
-</div>
+</div> -->
 {% endblock %}

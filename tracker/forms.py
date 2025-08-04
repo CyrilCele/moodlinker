@@ -1,5 +1,5 @@
 from django import forms
-from .models import UserProfile
+from .models import UserProfile, MoodEntry
 
 
 class UserProfileForm(forms.ModelForm):
@@ -25,3 +25,15 @@ class UserProfileForm(forms.ModelForm):
         self.fields["avatar"].required = True
         self.fields["date_of_birth"].required = True
         self.fields["preference"].required = True
+
+
+class MoodEntryForm(forms.ModelForm):
+    class Meta:
+        model = MoodEntry
+        fields = ["score", "reflection"]
+        widgets = {
+            "score": forms.RadioSelect(choices=[
+                (1, "😢"), (2, "😐"), (3, "😊"), (4, "😡"), (5, "😴")
+            ]),
+            "reflection": forms.Textarea(attrs={"rows": 2, "placeholder": "How are you feeling today?"})
+        }
