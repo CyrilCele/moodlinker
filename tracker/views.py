@@ -1,4 +1,3 @@
-from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
@@ -6,6 +5,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
+from .forms import UserProfileForm
 from .models import User
 
 
@@ -58,4 +58,15 @@ def register(request):
     else:
         return render(request, "register.html")
 
-# @login_required(login_url="login")
+
+@login_required
+def user_profile(request):
+    profile = request.user.profile
+    if request.method == "POST":
+        form = UserProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse("home"))
+    else:
+        form = UserProfileForm()
+    return render(request, "profile.html", {"form": form, "profile": profile})

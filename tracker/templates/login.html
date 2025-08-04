@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+<input type="button" class="btn btn-primary d-block mx-auto" value="Homepage" onclick="window.location.href='{% url 'home' %}'">
 <br>
 <h2>Login</h2>
 {% if message %}
@@ -19,7 +20,7 @@
                 <input name="password" type="password" class="form-control" placeholder="Password" autocomplete="off">
             </div>
             <br>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary">Login</button>
         </fieldset>
     </form>
 </div>

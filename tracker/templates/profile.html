@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h2>Your Profile</h2>
+
+    {% if profile.avatar %}
+    <img src="{{ profile.avatar.url }}" class="img-thumbnail mb-3" style="max-width: 200px;" alt="Profile Picture">
+    {% else %}
+    <p>No profile picture uploaded.</p>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" action="{% url 'profile' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success" style="margin-bottom: 40px;">Update Profile</button>
+    </form>
+</div>
+{% endblock %}
