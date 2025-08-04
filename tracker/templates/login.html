@@ -4,7 +4,10 @@
 <br>
 <h2>Login</h2>
 {% if message %}
-    <div>{{ message }}</div>
+    <div class="alert alert-dismissible alert-danger">
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div style="color: white; font-size: 1.15rem;">{{ message }}</div>
+    </div>
 {% endif %}
 <div class="container">
     <form action="{% url 'login' %}" method="post">
@@ -12,12 +15,12 @@
         <fieldset data-bs-theme="light">
             <div>
                 <label class="form-label mt-4">Username</label>
-                <input autofocus type="text" class="form-control" aria-describedby="username" name="username" placeholder="Enter username">
+                <input id="color" autofocus type="text" class="form-control" aria-describedby="username" name="username" placeholder="Enter username">
                 <small class="form-text text-muted">We'll never share your username with anyone else.</small>
             </div>
             <div>
                 <label class="form-label mt-4">Password</label>
-                <input name="password" type="password" class="form-control" placeholder="Password" autocomplete="off">
+                <input id="color" name="password" type="password" class="form-control" placeholder="Password" autocomplete="off">
             </div>
             <br>
             <button type="submit" class="btn btn-primary">Login</button>
