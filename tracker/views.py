@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .forms import UserProfileForm, MoodEntryForm
+from .forms import UserProfileForm, MoodEntryForm, HabitForm
 from .models import User, MoodEntry, Habit, HabitCompletion
 
 
@@ -85,29 +85,34 @@ def dashboard(request):
 
     # Check or create today's mood entry
     mood_entry = MoodEntry.objects.filter(user=user, date=today).first()
-    mood_form = MoodEntryForm(request.POST or None, instance=mood_entry)
+    mood_logged = mood_entry is not None
 
-    # User habits
+    # Ensure all habits have completions today
     habits = Habit.objects.filter(user=user)
-
-    # Create empty completion entries if they don't exist yet
     for habit in habits:
         HabitCompletion.objects.get_or_create(
             user=user, habit=habit, date=today)
-
     completions = HabitCompletion.objects.filter(user=user, date=today)
 
-    if request.method == "POST":
+    if request.method == "POST" and not mood_logged:
+        mood_form = MoodEntryForm(request.POST)
         if mood_form.is_valid():
-            mood_form.instance.user = user
+            mood = mood_form.save(commit=False)
+            mood.user = user
+            mood.date = today
+            # mood_form.instance.user = user
             mood_form.save()
 
         # Habit checkboxes
         for completion in completions:
             checkbox = request.POST.get(f"habit_{completion.habit.id}")
-            completion.completed = True if checkbox == "on" else False
+            # completion.completed = True if checkbox == "on" else False
+            completion.completed = checkbox == "on"
             completion.save()
         return HttpResponseRedirect(reverse("dashboard"))
+
+    # Fresh form after POST or GET
+    mood_form = MoodEntryForm()
 
     # Stats
     total = completions.count()
@@ -118,5 +123,23 @@ def dashboard(request):
         "habits": habits,
         "completions": completions,
         "done": done,
-        "total": total
+        "total": total,
+        "mood_logged": mood_logged
     })
+
+
+@login_required
+def create_habit(request):
+    if request.method == "POST":
+        form = HabitForm(request.POST)
+        if form.is_valid():
+            habit = form.save(commit=False)
+            habit.user = request.user
+            if Habit.user_habits_limit(request.user):
+                habit.save()
+                return HttpResponseRedirect(reverse("dashboard"))
+            else:
+                form.add_error(None, "Limit of 5 habits reached.")
+    else:
+        form = HabitForm()
+    return render(request, "create_habit.html", {"form": form})

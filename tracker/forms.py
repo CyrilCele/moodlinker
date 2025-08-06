@@ -1,5 +1,5 @@
 from django import forms
-from .models import UserProfile, MoodEntry
+from .models import UserProfile, MoodEntry, Habit
 
 
 class UserProfileForm(forms.ModelForm):
@@ -36,4 +36,15 @@ class MoodEntryForm(forms.ModelForm):
                 (1, "😢"), (2, "😐"), (3, "😊"), (4, "😡"), (5, "😴")
             ]),
             "reflection": forms.Textarea(attrs={"rows": 2, "placeholder": "How are you feeling today?"})
+        }
+
+
+class HabitForm(forms.ModelForm):
+    class Meta:
+        model = Habit
+        fields = ["habit", "description", "periodicity"]
+        widgets = {
+            "habit": forms.Textarea(attrs={"class": "form-control text-white bg-dark p-2"}),
+            "description": forms.Textarea(attrs={"class": "form-control text-white bg-dark p-2", "rows": 2}),
+            "periodicity": forms.Select(attrs={"class": "form-control text-white bg-dark p-2"})
         }
