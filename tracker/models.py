@@ -68,17 +68,21 @@ class Habit(models.Model):
 
 class MoodEntry(models.Model):
     MOOD_CHOICES = [
-        (1, "😢 Sad"),
-        (2, "😐 Meh"),
-        (3, "😊 Happy"),
-        (4, "😡 Angry"),
-        (5, "😴 Tired")
+        (1, "1 😢 Sad"),
+        (2, "2 😐 Meh"),
+        (3, "3 😊 Happy"),
+        (4, "4 😡 Angry"),
+        (5, "5 😴 Tired")
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     score = models.IntegerField(choices=MOOD_CHOICES)
     reflection = models.TextField(blank=True)
     date = models.DateField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "date")
+        ordering = ["-date"]
 
     def __str__(self):
         return f"{self.user.username} - Mood: {self.score} on {self.date}"
@@ -92,3 +96,4 @@ class HabitCompletion(models.Model):
 
     class Meta:
         unique_together = ("user", "habit", "date")
+        ordering = ["-date"]

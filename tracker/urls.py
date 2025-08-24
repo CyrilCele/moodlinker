@@ -12,4 +12,8 @@ urlpatterns = [
     path("habit/<int:habit_id>/", views.user_habit, name="user_habit"),
     path("habit/<int:habit_id>/delete/",
          views.delete_habit, name="delete_habit"),
+    path("analytics/", views.analytics, name="analytics"),
+
+    # JSON for Chart.js (no mock data)
+    path("api/chart-data/", views.chart_data_api, name="chart_data_api"),
 ]

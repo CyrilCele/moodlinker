@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load custom_filters form_helpers %}
+{% block content %}
+<div class="my-5 p-4 bg-dark text-light rounded shadow" style="font-family: monospace;">
+    <h5><strong>{{ request.user.first_name|default:request.user.username }}'s Analytics</strong></h5>
+    <!-- Chart View Selector -->
+     <form method="get" class="mb-3 d-flex align-items-center gap-2">
+        <label for="view_mode" class="form-label m-o">📊 Select view:</label>
+        <select name="view" id="view_mode" class="form-select bg-secondary text-dark w-auto">
+            <option value="daily">Daily</option>
+            <option value="weekly" selected>Weekly</option>
+            <option value="monthly">Monthly</option>
+        </select>
+        <button type="button" id="updateChart" class="btn btn-outline-info">Update Chart</button>
+     </form>
+     <div class="mb-5">
+        <canvas id="moodChart" height="110"></canvas>
+     </div>
+</div>
+{% endblock %}

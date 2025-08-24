@@ -1,18 +1,18 @@
-import json
 from collections import defaultdict
 from datetime import date, timedelta
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.db import IntegrityError
-from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.db import IntegrityError, transaction
+from django.http import HttpResponseRedirect, JsonResponse, Http404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
 
-from .forms import UserProfileForm, MoodEntryForm, HabitForm
-from .models import User, MoodEntry, Habit, HabitCompletion
+from tracker.forms import UserProfileForm, MoodEntryForm, HabitForm
+from tracker.models import User, MoodEntry, Habit, HabitCompletion
+from tracker.services import AnalyticsService, AISuggestionService
 
 
 def index(request):
@@ -87,55 +87,83 @@ def user_profile(request):
 @login_required
 def dashboard(request):
     user = request.user
-    today = date.today()
+    today = timezone.now().date()
 
-    # Check or create today's mood entry
-    mood_entry = MoodEntry.objects.filter(user=user, date=today).first()
-    mood_logged = mood_entry is not None
-
-    # Ensure all habits have completions today
+    # Ensure completions exist for today
     habits = Habit.objects.filter(user=user)
     for habit in habits:
         HabitCompletion.objects.get_or_create(
-            user=user, habit=habit, date=today)
-    completions = HabitCompletion.objects.filter(user=user, date=today)
+            user=user, habit=habit, date=today
+        )
+
+    # One mood per day
+    mood_entry = MoodEntry.objects.filter(user=user, date=today).first()
+    mood_logged = mood_entry is not None
 
     if request.method == "POST" and not mood_logged:
-        mood_form = MoodEntryForm(request.POST)
-        if mood_form.is_valid():
-            mood = mood_form.save(commit=False)
-            mood.user = user
-            mood.date = today
-            # mood_form.instance.user = user
-            mood_form.save()
+        form = MoodEntryForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                mood = form.save(commit=False)
+                mood.user = user
+                mood.date = today
+                mood.save()
 
-        # Habit checkboxes
-        for completion in completions:
-            checkbox = request.POST.get(f"habit_{completion.habit.id}")
-            # completion.completed = True if checkbox == "on" else False
-            completion.completed = checkbox == "on"
-            completion.save()
-        return HttpResponseRedirect(reverse("dashboard"))
+                # update today's habit completions
+                completions = HabitCompletion.objects.filter(
+                    user=user, date=today)
+                for complete in completions:
+                    complete.completed = request.POST.get(
+                        f"habit_{complete.habit.id}") == "on"
+                    complete.save()
 
-    # Fresh form after POST or GET
-    mood_form = MoodEntryForm()
+            return HttpResponseRedirect(reverse("dashboard"))
+    else:
+        form = MoodEntryForm()
 
-    # Stats
-    total = completions.count()
+    completions = HabitCompletion.objects.filter(
+        user=user, date=today).select_related("habit")
     done = completions.filter(completed=True).count()
-    # view_mode = request.GET.get("view", "weekly")
-    # chart_data = get_chart_data(user, view_mode)
+    total = completions.count()
+
+    # AI Suggestion
+    ai_suggestion = AISuggestionService.suggest(user)
 
     return render(request, "dashboard.html", {
-        "mood_form": mood_form,
+        "mood_form": form,
         "habits": habits,
         "completions": completions,
         "done": done,
         "total": total,
         "mood_logged": mood_logged,
-        # "chart_data": chart_data,
-        # "view_mode": view_mode
+        "ai_suggestion": ai_suggestion,
     })
+
+
+@login_required
+def chart_data_api(request):
+    """
+    Return JSON payload for Chart.js; no mock data.
+    """
+    user = request.user
+    view = request.GET.get("view", "weekly")
+    labels, moods, rates = AnalyticsService.summaries(user, view)
+    payload = {
+        "labels": labels,
+        "datasets": [
+            {
+                "label": f"Mood ({view.title()})",
+                "data": moods,
+                "yAxisID": "y",
+            },
+            {
+                "label": f"Habit Completion % ({view.title()})",
+                "data": rates,
+                "yAxisID": "y1",
+            }
+        ]
+    }
+    return JsonResponse(payload)
 
 
 @login_required
@@ -172,57 +200,5 @@ def delete_habit(request, habit_id):
         return HttpResponseRedirect(reverse("dashboard"))
     return render(request, "confirm_delete.html", {"habit": habit})
 
-
-# @login_required
-# def get_chart_data(user, view_mode="weekly"):
-#     today = timezone.now().date()
-#     mood_entries = MoodEntry.objects.filter(user=user)
-
-#     if view_mode == "daily":
-#         entries = mood_entries.order_by("-date")[:7]
-#         entries = list(reversed(entries))
-#         labels = [entry.date.strftime("%b %d") for entry in entries]
-#         scores = [entry.score for entry in entries]
-
-#     elif view_mode == "monthly":
-#         start = today.replace(day=1)
-#         entries = mood_entries.filter(date__gte=start)
-#         data = defaultdict(list)
-
-#         for entry in entries:
-#             key = entry.date.strftime("%d %b")
-#             data[key].append(entry.score)
-#         labels = list(data.keys())
-#         scores = [round(sum(value) / len(value), 2) for value in data.values()]
-
-#     else:  # weekly (default)
-#         start = today - timedelta(days=6)
-#         entries = mood_entries.filter(date__gte=start)
-#         data = defaultdict(list)
-
-#         for entry in entries:
-#             key = entry.date.strftime("%A")
-#             data[key].append(entry.score)
-
-#         week_days = ["Monday", "Tuesday", "Wednesday",
-#                      "Thursday", "Friday", "Saturday", "Sunday"]
-#         labels = week_days
-#         scores = [round(sum(data[day]) / len(data[day]), 2)
-#                   if data[day] else 0 for day in week_days]
-
-#     # chart_data = {
-#     #     "labels": labels,
-#     #     "datasets": [{
-#     #         "label": f"Mood ({view_mode.title()})",
-#     #         "data": scores,
-#     #         "borderColor": "#0dcaf0",
-#     #         "backgroundColor": "rgba(13, 202, 240, 0.2)",
-#     #         "fill": True,
-#     #         "tension": 0.4
-#     #     }]
-#     # }
-#     # return chart_data
-#     return {
-#         "labels": labels,
-#         "values": scores,
-#     }
+def analytics(request):
+    return render(request, "analytics.html", {})
