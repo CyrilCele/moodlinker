@@ -191,14 +191,15 @@ def user_habit(request, habit_id):
 
 @login_required
 def delete_habit(request, habit_id):
-    habit = HabitCompletion.objects.get(id=habit_id)
 
     if request.method == "POST":
+        habit = HabitCompletion.objects.get(id=habit_id)
         habit.delete()
         messages.success(
             request, f"Habit '{habit.habit}' deleted successfully.")
         return HttpResponseRedirect(reverse("dashboard"))
     return render(request, "confirm_delete.html", {"habit": habit})
+
 
 def analytics(request):
     return render(request, "analytics.html", {})

@@ -7,7 +7,7 @@
     <a href="{% url 'analytics' %}" class="btn btn-outline-info btn-sm mb-3">
         <i class="bi bi-bar-chart"></i> View Analytics
     </a>
-    <p class="mb-1"><strong>AI Insight:</strong> {{ ai_suggestion }}</p>
+    <p class="alert alert-success mt-3 mb-1"><strong>AI Insight:</strong> {{ ai_suggestion }}</p>
     <form method="post" class="mt-4">
         {% csrf_token %}
         <!-- MOOD SCORE -->
@@ -47,13 +47,21 @@
                                         <i class="bi bi-x-circle-fill text-danger fs-5"></i>
                                     {% endif %}
                                 </div>
-                                <div class="col-4 text-end">
+                                <div class="col-2 text-end">
                                     <input type="checkbox"
                                         class="form-check-input"
                                         name="habit_{{ habit.id }}"
                                         id="habit_{{ habit.id }}"
                                         {% if completion.completed %}checked{% endif %}
                                         {% if mood_logged %}disabled{% endif %}>
+                                </div>
+                                <div class="col-2 text-end">
+                                    <form method="post" action="{% url 'delete_habit' completion.habit.id %}" onsubmit="return confirm('Delete this habit');" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" {% if mood_logged %}disabled{% endif %}>
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </li>

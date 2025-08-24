@@ -5,6 +5,9 @@
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
+        {% if form.non_field_errors %}
+            <div class="alert alert-warning">{{ form.non_field_errors }}</div>
+        {% endif %}
         <button type="submit" class="btn btn-primary mt-3">Add Habit</button>
     </form>
 </div>
