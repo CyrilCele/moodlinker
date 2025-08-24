@@ -4,6 +4,20 @@
 <div class="container my-5 p-4 bg-dark text-light rounded shadow" style="font-family: monospace;">
     <h5><strong>$ moodlinker</strong></h5>
     <p>Welcome back, {{ request.user.first_name|default:request.user.username }}</p>
+    <!-- Chart View Mode Dropdown -->
+    <!-- <form method="get" class="mb-3">
+        <label for="view_mode" class="form-label">📊 Select view:</label>
+        <select name="view" id="view_mode" class="form-select bg-secondary text-dark w-auto d-inline">
+            <option value="daily" {% if view_mode == 'daily' %}selected{% endif %}>Daily</option>
+            <option value="weekly" {% if view_mode == 'weekly' %}selected{% endif %}>Weekly</option>
+            <option value="monthly" {% if view_mode == 'monthly' %}selected{% endif %}>Monthly</option>
+        </select>
+        <button type="submit" class="btn btn-outline-info ms-2">Update Chart</button>
+    </form> -->
+    <!-- Chart Container -->
+     <!-- <div class="mb-5">
+        <canvas id="moodChart" height="100"></canvas>
+     </div> -->
     <form method="post" class="mt-4">
         {% csrf_token %}
         <!-- MOOD SCORE -->
@@ -13,7 +27,8 @@
             <div class="btn-group" role="group">
                 {% for radio in mood_form.score %}
                     <label class="btn btn-outline-light {% if radio.choice_value == mood_form.instance.score|stringformat:'s' %}active{% endif %}">
-                        {{ radio.tag|add_disabled:mood_logged }} {{ radio.choice_label }}
+                        {{ radio.tag|add_disabled:mood_logged }}
+                        <span class="ms-1">{{ radio.choice_label }}</span>
                     </label>
                 {% endfor %}
             </div>
@@ -34,7 +49,7 @@
                         <li class="list-group-item bg-dark text-light">
                             <div class="row align-items-center">
                                 <div class="col-6">
-                                    [{{ forloop.counter }}] {{ habit.habit }}
+                                    [{{ forloop.counter }}] <a href="{% url 'user_habit' habit.id %}" id="habits">{{ habit.habit }}</a>
                                 </div>
                                 <div class="col-2 text-center">
                                     {% if completion.completed %}
@@ -67,6 +82,39 @@
     <p>See you tomorrow!</p>
 </div>
 
+<!-- Chart.js Script -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById("moodChart").getContext("2d");
+    const moodChart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: {{ chart_data.labels|safe }},
+            datasets: [{
+                label: "Mood Score",
+                data: {{ chart_data.values|safe }},
+                backgroundColor: "rgba(0, 123, 255, 0.2)",
+                borderColor: "rgba(0, 123, 255, 1)",
+                borderWidth: 2,
+                pointBackgroundColor: "rgba(255, 255, 255, 0.8)",
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 1,
+                    max: 5,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+</script> -->
 
 <!-- <div class="container hero">
     <h1 class="display-3 fw-bold">View Dashboard</h1>

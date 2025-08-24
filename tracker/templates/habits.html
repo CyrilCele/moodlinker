@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5 p-4 bg-dark text-light rounded shadow" style="font-family: monospace;">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">HABIT</th>
+                <th scope="col">DESCRIPTION</th>
+                <th scope="col">PERIODICITY</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="table-dark">
+                <td>{{ habit.habit }}</td>
+                <td>{{ habit.description }}</td>
+                <td>{{ habit.periodicity }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg">Go to Dashboard</a>
+{% endblock %}

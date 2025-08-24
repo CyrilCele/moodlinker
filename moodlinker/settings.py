@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "tracker",
+    "phonenumber_field",
 ]
 
 AUTH_USER_MODEL = 'tracker.User'

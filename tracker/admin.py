@@ -1,6 +1,11 @@
 from django.contrib import admin
 
-from .models import User, UserProfile, Habit, MoodEntry, HabitCompletion
+from .models import User, UserProfile, Habit, MoodEntry, HabitCompletion, Address
+
+
+class AddressAdmin(admin.ModelAdmin):
+    list_display = ["street_address", "city",
+                    "state_province", "postal_code", "country"]
 
 
 class UserProfileAdmin(admin.ModelAdmin):
@@ -21,6 +26,7 @@ class HabitCompletionAdmin(admin.ModelAdmin):
 
 # Register your models here.
 admin.site.register(User)
+admin.site.register(Address, AddressAdmin)
 admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(Habit, HabitAdmin)
 admin.site.register(MoodEntry, MoodEntryAdmin)

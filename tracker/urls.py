@@ -9,4 +9,7 @@ urlpatterns = [
     path("profile/", views.user_profile, name="profile"),
     path("dashboard/", views.dashboard, name="dashboard"),
     path("create-habit/", views.create_habit, name="create_habit"),
+    path("habit/<int:habit_id>/", views.user_habit, name="user_habit"),
+    path("habit/<int:habit_id>/delete/",
+         views.delete_habit, name="delete_habit"),
 ]

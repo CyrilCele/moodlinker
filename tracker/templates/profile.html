@@ -11,6 +11,15 @@
 
     <form method="post" enctype="multipart/form-data" action="{% url 'profile' %}">
         {% csrf_token %}
+        <div class="card mb-3">
+        <h3 class="card-header">{{ profile.user }}</h3>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">{{ profile.bio }}</li>
+            <li class="list-group-item">{{ profile.date_of_birth }}</li>
+            <li class="list-group-item">{{ profile.address.street_address }}</li>
+            <li class="list-group-item">{{ profile.phone_number }}</li>
+            <li class="list-group-item">{{ profile.preference }}</li>
+        </ul>
         {{ form.as_p }}
         <button type="submit" class="btn btn-success" style="margin-bottom: 40px;">Update Profile</button>
     </form>

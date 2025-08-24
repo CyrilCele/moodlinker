@@ -1,23 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-
-class User(AbstractUser):
-    pass
-
-
-class UserProfile(models.Model):
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="profile")
-    bio = models.TextField(blank=True)
-    avatar = models.ImageField(
-        upload_to="profile_pics/", null=True, blank=True)
-    date_of_birth = models.DateField(null=True, blank=True)
-    # Can store user preferences as JSON
-    preference = models.TextField(blank=True)
-
-    def __str__(self):
-        return f"{self.user.username}'s Profile."
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 PERIODICITY_CHOICES = [
@@ -25,6 +9,38 @@ PERIODICITY_CHOICES = [
     ("weekly", "Weekly"),
     ("monthly", "Monthly")
 ]
+
+
+class User(AbstractUser):
+    pass
+
+
+class Address(models.Model):
+    street_address = models.CharField(max_length=255)
+    city = models.CharField(max_length=100)
+    state_province = models.CharField(max_length=100, blank=True, null=True)
+    postal_code = models.CharField(max_length=20)
+    country = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.street_address}, {self.city}, {self.country}"
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="profile")
+    address = models.OneToOneField(
+        Address, blank=True, null=True, on_delete=models.CASCADE, related_name="address")
+    bio = models.TextField(blank=True)
+    avatar = models.ImageField(
+        upload_to="profile_pics/", null=True, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    phone_number = PhoneNumberField(region="ZA", blank=True, null=True)
+    # Can store user preferences as JSON
+    preference = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s Profile."
 
 
 class Habit(models.Model):
@@ -51,8 +67,16 @@ class Habit(models.Model):
 
 
 class MoodEntry(models.Model):
+    MOOD_CHOICES = [
+        (1, "😢 Sad"),
+        (2, "😐 Meh"),
+        (3, "😊 Happy"),
+        (4, "😡 Angry"),
+        (5, "😴 Tired")
+    ]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    score = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)])
+    score = models.IntegerField(choices=MOOD_CHOICES)
     reflection = models.TextField(blank=True)
     date = models.DateField(auto_now_add=True)
 

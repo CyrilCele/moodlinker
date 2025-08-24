@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "1e74138e4cc148add35b1a8af74c46cdc237340f93ed814c6d0788e5b14b6e7d"
+            "sha256": "ad1371ba01bedaa97edb335f028545f30fed030354c14cb61898d3d783520531"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -26,12 +26,12 @@
         },
         "django": {
             "hashes": [
-                "sha256:60c35bd96201b10c6e7a78121bd0da51084733efa303cc19ead021ab179cef5e",
-                "sha256:a1228c384f8fa13eebc015196db7b3e08722c5058d4758d20cb287503a540d8f"
+                "sha256:0745b25681b129a77aae3d4f6549b62d3913d74407831abaa0d9021a03954bae",
+                "sha256:2b2ada0ee8a5ff743a40e2b9820d1f8e24c11bac9ae6469cd548f0057ea6ddcd"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.10'",
-            "version": "==5.2.4"
+            "version": "==5.2.5"
         },
         "django-admin-interface": {
             "hashes": [
@@ -48,6 +48,17 @@
             ],
             "version": "==0.14.0"
         },
+        "django-phonenumber-field": {
+            "extras": [
+                "phonenumbers"
+            ],
+            "hashes": [
+                "sha256:9ba66873bf47401b13fc57797fbf85e785864a6bfdc8b9daa3a9012886567045",
+                "sha256:f19450625574ad3a2de047c409527d0e57699496849e71e53b53e8679ff67b27"
+            ],
+            "markers": "python_version >= '3.9'",
+            "version": "==8.1.0"
+        },
         "mysqlclient": {
             "hashes": [
                 "sha256:199dab53a224357dd0cb4d78ca0e54018f9cee9bf9ec68d72db50e0a23569076",
@@ -62,6 +73,13 @@
             "index": "pypi",
             "markers": "python_version >= '3.8'",
             "version": "==2.2.7"
+        },
+        "phonenumbers": {
+            "hashes": [
+                "sha256:6573858dcf0a7a2753a071375e154d9fc11791546c699b575af95d2ba7d84a1d",
+                "sha256:a8ebb2136f1f14dfdbadb98be01cb71b96f880dea011eb5e0921967fe3a23abf"
+            ],
+            "version": "==9.0.11"
         },
         "pillow": {
             "hashes": [
