@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+from celery.schedules import crontab
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -39,7 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "tracker",
+    "tracker.apps.TrackerConfig",
     "phonenumber_field",
 ]
 
@@ -117,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "Africa/Johannesburg"
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -128,7 +129,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
@@ -139,3 +139,37 @@ LOGIN_URL = "/login/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Email backend
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+# Gmail SMTP configuration
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "nkululeko.cele@gmail.com"
+EMAIL_HOST_PASSWORD = "gerc agqg ubzz fnpy"
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# Celery Configuration (using Redis as the message broker)
+CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
+CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/1"
+
+# Celery Options
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 60 * 5  # 5 minutes
+
+# Celery Beat Schedules
+CELERY_BEAT_SCHEDULE = {
+    # Every minute: process any due reminders (cheap, idempotent)
+    "process-due-reminders": {
+        "task": "tracker.tasks.process_due_reminders",
+        "schedule": 60.0,  # seconds
+    },
+    # Nightly backfill / maintenance
+    "rebuild-reminders-nightly": {
+        "task": "tracker.tasks.rebuild_all_user_reminders",
+        "schedule": crontab(hour=1, minute=0),
+    }
+}

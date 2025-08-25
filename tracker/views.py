@@ -1,18 +1,17 @@
-from collections import defaultdict
-from datetime import date, timedelta
-
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError, transaction
-from django.http import HttpResponseRedirect, JsonResponse, Http404
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
 
-from tracker.forms import UserProfileForm, MoodEntryForm, HabitForm
-from tracker.models import User, MoodEntry, Habit, HabitCompletion
+from tracker.forms import UserProfileForm, MoodEntryForm, HabitForm, NotificationPreferencesForm
+from tracker.models import User, MoodEntry, Habit, HabitCompletion, Notification
 from tracker.services import AnalyticsService, AISuggestionService
+from tracker.tasks import send_mood_reminder
+from tracker.utils.ics import generate_ics
 
 
 def index(request):
@@ -88,6 +87,10 @@ def user_profile(request):
 def dashboard(request):
     user = request.user
     today = timezone.now().date()
+
+    # Demo mood reminder
+    if hasattr(user, "latest_mood") and user.latest_mood < 3:
+        send_mood_reminder.delay(user.email, user.latest_mood)
 
     # Ensure completions exist for today
     habits = Habit.objects.filter(user=user)
@@ -201,5 +204,57 @@ def delete_habit(request, habit_id):
     return render(request, "confirm_delete.html", {"habit": habit})
 
 
+@login_required
 def analytics(request):
     return render(request, "analytics.html", {})
+
+
+@login_required
+def about(request):
+    return render(request, "about.html", {})
+
+
+@login_required
+def preferences(request):
+    profile = request.user.profile
+    if request.method == "POST":
+        form = NotificationPreferencesForm(request.POST, isinstance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Preferences saved.")
+            from tracker.tasks import schedule_user_habit_reminders
+            schedule_user_habit_reminders.delay(request.user.id)
+            return redirect("preferences")
+    else:
+        form = NotificationPreferencesForm()
+    return render(request, "preferences.html", {"form": form})
+
+
+@login_required
+def notifications(request):
+    items = Notification.objects.filter(
+        user=request.user).order_by("-created_at")[:50]
+    return render(request, "notifications.html", {"items": items})
+
+
+@login_required
+def mark_notification_read(request, pk):
+    note = get_object_or_404(Notification, pk=pk, user=request.user)
+    note.read = True
+    note.save(update_fields=["read"])
+    return redirect("notifications")
+
+
+@login_required
+def calendar_feed(request, token):
+    try:
+        user = User.objects.get(calendar_token=token)
+    except User.DoesNotExist:
+        raise Http404("Invalid calendar token.")
+
+    habits = Habit.objects.filter(user=user)
+    ics_data = generate_ics(user, habits)
+
+    response = HttpResponse(ics_data, content_type="text/calendar")
+    response["Content-Disposition"] = "attachment; filename='habits.ics'"
+    return response

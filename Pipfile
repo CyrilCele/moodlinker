@@ -9,6 +9,8 @@ mysqlclient = "*"
 django-admin-interface = "*"
 django-phonenumber-field = {extras = ["phonenumbers"], version = "*"}
 nltk = "*"
+pytz = "*"
+icalendar = "*"
 
 [dev-packages]
 black = "*"

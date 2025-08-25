@@ -7,6 +7,12 @@
     <a href="{% url 'analytics' %}" class="btn btn-outline-info btn-sm mb-3">
         <i class="bi bi-bar-chart"></i> View Analytics
     </a>
+    <a href="{% url 'preferences' %}" class="btn btn-outline-info btn-sm mb-3">
+        <i class="bi bi-bell"></i> 
+    </a>
+    <a href="{% url 'notifications' %}" class="btn btn-outline-info btn-sm mb-3">
+        <i class="bi bi-envelope-exclamation"></i> 
+    </a>
     <p class="alert alert-success mt-3 mb-1"><strong>AI Insight:</strong> {{ ai_suggestion }}</p>
     <form method="post" class="mt-4">
         {% csrf_token %}
@@ -55,14 +61,6 @@
                                         {% if completion.completed %}checked{% endif %}
                                         {% if mood_logged %}disabled{% endif %}>
                                 </div>
-                                <div class="col-2 text-end">
-                                    <form method="post" action="{% url 'delete_habit' completion.habit.id %}" onsubmit="return confirm('Delete this habit');" class="d-inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" {% if mood_logged %}disabled{% endif %}>
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
                             </div>
                         </li>
                     {% endwith %}
@@ -70,7 +68,7 @@
             </ul>
         </div>
         <div class="d-grit mt-4">
-            <button type="submit" class="btn btn-outline-success" {% if mood_logged %}disabled{% endif %}>Save</button>
+            <button type="submit" class="btn btn-outline-success">Save</button>
         </div>
     </form>
     <hr class="bg-secondary my-4">

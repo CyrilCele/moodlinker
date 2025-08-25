@@ -31,8 +31,7 @@ class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ["avatar", "bio", "date_of_birth",
-                  "phone_number", "preference"]
+        fields = ["avatar", "bio", "date_of_birth", "phone_number"]
         widgets = {
             "date_of_birth": forms.DateInput(
                 attrs={
@@ -43,7 +42,6 @@ class UserProfileForm(forms.ModelForm):
             "phone_number": forms.TextInput(attrs={"class": "form-control text-white bg-dark p-2", "placeholder": "+27 82 123 4567"}),
             "bio": forms.Textarea(attrs={"class": "form-control text-white bg-dark p-2"}),
             "avatar": forms.ClearableFileInput(attrs={"class": "form-control text-white bg-dark p-2"}),
-            "preference": forms.Textarea(attrs={"class": "form-control text-white bg-dark p-2", "placeholder": "e.g. theme: dark, notifications: on"})
         }
 
     def __init__(self, *args, **kwargs):
@@ -52,7 +50,6 @@ class UserProfileForm(forms.ModelForm):
         # Explicitly mark fields as required
         self.fields["bio"].required = False
         self.fields["date_of_birth"].required = False
-        self.fields["preference"].required = False
 
         # Populate address fields if address exists
         if self.instance and self.instance.address:
@@ -68,7 +65,7 @@ class UserProfileForm(forms.ModelForm):
 
         # List of fields to preserve if empty
         fields_to_preserve = ["bio", "date_of_birth",
-                              "phone_number", "preference"]
+                              "phone_number"]
 
         for field in fields_to_preserve:
             form_value = self.cleaned_data.get(field)
@@ -122,4 +119,17 @@ class HabitForm(forms.ModelForm):
             "habit": forms.Textarea(attrs={"class": "form-control text-white bg-dark p-2"}),
             "description": forms.Textarea(attrs={"class": "form-control text-white bg-dark p-2", "rows": 2}),
             "periodicity": forms.Select(attrs={"class": "form-control text-white bg-dark p-2"})
+        }
+
+
+class NotificationPreferencesForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ["notify_low_mood", "low_mood_threshold",
+                  "timezone", "reminder_hour_local"]
+        widgets = {
+            "notify_low_mood": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "low_mood_threshold": forms.NumberInput(attrs={"class": "form-control text-white bg-dark p-2", "min": 1, "max": 5}),
+            "timezone": forms.TextInput(attrs={"class": "form-control text-white bg-dark p-2", "placeholder": "e.g. Europe/Paris"}),
+            "reminder_hour_local": forms.NumberInput(attrs={"class": "form-control text-white bg-dark p-2", "min": 0, "max": 23}),
         }

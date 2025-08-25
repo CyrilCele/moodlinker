@@ -6,4 +6,4 @@ class TrackerConfig(AppConfig):
     name = "tracker"
 
     def ready(self):
-        import tracker.signals
+        from tracker import signals  # noqa: F401

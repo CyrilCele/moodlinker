@@ -1,7 +1,11 @@
+import secrets
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 from phonenumber_field.modelfields import PhoneNumberField
+
+from zoneinfo import ZoneInfo
 
 
 PERIODICITY_CHOICES = [
@@ -12,7 +16,14 @@ PERIODICITY_CHOICES = [
 
 
 class User(AbstractUser):
-    pass
+    timezone = models.CharField(max_length=50, default="UTC")
+    calendar_token = models.CharField(
+        max_length=64, unique=True, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.calendar_token:
+            self.calendar_token = secrets.token_hex(32)
+        super().save(*args, **kwargs)
 
 
 class Address(models.Model):
@@ -28,19 +39,67 @@ class Address(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="profile")
-    address = models.OneToOneField(
-        Address, blank=True, null=True, on_delete=models.CASCADE, related_name="address")
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile")
+    address = models.ForeignKey(
+        Address, blank=True, null=True, on_delete=models.SET_NULL, related_name="profiles")
     bio = models.TextField(blank=True)
     avatar = models.ImageField(
         upload_to="profile_pics/", null=True, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
     phone_number = PhoneNumberField(region="ZA", blank=True, null=True)
-    # Can store user preferences as JSON
-    preference = models.TextField(blank=True)
+
+    # Notifications & timezone
+    notify_low_mood = models.BooleanField(default=True)
+    low_mood_threshold = models.PositiveSmallIntegerField(
+        default=2)    # 1-5 scale; alert if mood <= threshold
+    # e.g "America/New_York"
+    timezone = models.CharField(max_length=64, default="UTC")
+    reminder_hour_local = models.PositiveSmallIntegerField(
+        default=9)   # 0-23 local time
+
+    def tz(self) -> ZoneInfo:
+        try:
+            return ZoneInfo(self.timezone)
+        except Exception:
+            return ZoneInfo("UTC")
 
     def __str__(self):
         return f"{self.user.username}'s Profile."
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications")
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    read = models.BooleanField(default=False)
+    # e.g., info, warning, alert
+    category = models.CharField(max_length=32, default="info")
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Notification({self.user}): {self.message[:32]}..."
+
+
+class HabitReminder(models.Model):
+    """
+    Tracks the next time we should remind a user for a habit (local-time aware).
+    """
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE, related_name="reminders")
+    habit = models.ForeignKey(
+        "Habit", on_delete=models.CASCADE, related_name="reminders")
+    next_trigger_utc = models.DateTimeField()
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ("user", "habit")
+        ordering = ["next_trigger_utc"]
+
+    def __str__(self):
+        return f"Reminder({self.user}, {self.habit.habit}) at {self.next_trigger_utc.isoformat()}"
 
 
 class Habit(models.Model):

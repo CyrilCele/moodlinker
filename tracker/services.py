@@ -1,8 +1,9 @@
+from django.core.mail import send_mail
+from django.conf import settings
 from collections import defaultdict
-from datetime import date, timedelta
+from datetime import timedelta
 from statistics import mean
 
-from django.db.models import Q
 from django.utils import timezone
 
 from nltk.sentiment import SentimentIntensityAnalyzer
@@ -181,3 +182,17 @@ class AISuggestionService:
                 "Keep the streak alive. Aim for one simple habit before noon.")
 
         return " ".join(suggestion)
+
+
+# Demo reminder
+def send_reminder_email(to_email, subject, message):
+    """
+    Sends a reminder/notification email using Gmail SMTP.
+    """
+    send_mail(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,
+        [to_email],
+        fail_silently=False,
+    )

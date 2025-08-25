@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    <h1 class="h3 mb-4">Notification Preferences</h1>
+    <form action="post" class="card p-4 shadow-sm">
+        {% csrf_token %}
+        <div class="form-check mb-3">
+            {{ form.notify_low_mood }} <label class="form-check-label">Enable low mood alerts</label>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Low mood threshold (1-5)</label>
+            {{ form.low_mood_threshold }}
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Timezone</label>
+            {{ form.timezone }}
+            <div class="form-text">e.g. Europe/Paris, Africa/Johannesburg, America/New York</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Daily reminder hour (local, 0-23)</label>
+            {{ form.reminder_hour_local }}
+        </div>
+        <button class="btn btn-primary">Save</button>
+    </form>
+</div>
+{% endblock %}
