@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from tracker import views
 
 urlpatterns = [
@@ -19,7 +19,6 @@ urlpatterns = [
     path("notifications/<int:pk>/read/",
          views.mark_notification_read, name="mark_notification_read"),
     path("calendar/<str:token>.ics/", views.calendar_feed, name="calendar_feed"),
-
-    # JSON for Chart.js (no mock data)
     path("api/chart-data/", views.chart_data_api, name="chart_data_api"),
+    path("api/", include("tracker.api.urls")),
 ]

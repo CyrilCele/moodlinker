@@ -1,3 +1,5 @@
+import yaml
+from pathlib import Path
 from django.core.mail import send_mail
 from django.conf import settings
 from collections import defaultdict
@@ -196,3 +198,9 @@ def send_reminder_email(to_email, subject, message):
         [to_email],
         fail_silently=False,
     )
+
+
+AI_CONFIG_PATH = Path(__file__).resolve().parent.parent / \
+    "config" / "ai_rules.yaml"
+with open(AI_CONFIG_PATH, "r") as fh:
+    AI_RULES = yaml.safe_load(fh)

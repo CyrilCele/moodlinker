@@ -1,0 +1,10 @@
+positive_threshold: 0.3 # vader compound > this is positive
+negative_threshold: -0.25
+recommendations:
+  low_mood:
+    - "Try a 2-minute breathing exercise"
+    - "Drink a glass of water"
+  neutral:
+    - "Try a short walk"
+  high_mood:
+    - "Add one more repetition to your habit"

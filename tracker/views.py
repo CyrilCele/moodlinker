@@ -218,7 +218,7 @@ def about(request):
 def preferences(request):
     profile = request.user.profile
     if request.method == "POST":
-        form = NotificationPreferencesForm(request.POST, isinstance=profile)
+        form = NotificationPreferencesForm(request.POST, instance=profile)
         if form.is_valid():
             form.save()
             messages.success(request, "Preferences saved.")

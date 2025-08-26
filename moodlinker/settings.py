@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "tracker.apps.TrackerConfig",
     "phonenumber_field",
+    "rest_framework",
 ]
 
 AUTH_USER_MODEL = 'tracker.User'
@@ -89,6 +90,7 @@ DATABASES = {
         "PORT": "3306",
         "OPTIONS": {
             "init_command": "SET sql_mode = 'STRICT_TRANS_TABLES'",
+            "charset": "utf8mb4",
         }
     }
 }

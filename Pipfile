@@ -11,6 +11,9 @@ django-phonenumber-field = {extras = ["phonenumbers"], version = "*"}
 nltk = "*"
 pytz = "*"
 icalendar = "*"
+pytest = "*"
+djangorestframework = "*"
+pyyaml = "*"
 
 [dev-packages]
 black = "*"
