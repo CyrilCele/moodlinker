@@ -1,0 +1,55 @@
+.hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.btn-primary, .btn-outline-light {
+    margin: 10px;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.tagline {
+    font-size: 1.2rem;
+    margin-top: 1rem;
+    opacity: 0.9;
+}
+
+input#color {
+    color: rgb(3, 49, 26);
+    font-weight: 800;
+}
+
+a#text,
+a#moodlinker {
+    font-weight: 800;
+}
+
+a#text:hover {
+    background-color: brown;
+    color: beige;
+    border-radius: 2rem;
+}
+
+a#moodlinker:hover {
+    color: brown;
+}
+
+a#habits {
+    text-decoration: none;
+    color: #fff;
+}
+
+a#habits:hover {
+    color: blue;
+    font-size: 1.2rem;
+}
+
+.clock {
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
