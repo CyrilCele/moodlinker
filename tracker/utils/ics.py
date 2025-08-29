@@ -1,23 +1,29 @@
-from icalendar import Calendar, Event
-from datetime import datetime, timedelta
-import pytz
+def generate_ics(user):
+    """
+    Generate ICS calendar for all active habit reminders of a user.
+    """
+    from icalendar import Calendar, Event
+    from datetime import timedelta
+    import pytz
 
-
-def generate_ics(user, habits):
-    cal = Calendar
+    cal = Calendar()
     cal.add("prodid", "-//MoodLinker//Habit Reminders/EN")
     cal.add("version", "2.0")
 
     tz = pytz.timezone(user.timezone)
 
-    for habit in habits:
+    # Get all active reminders
+    reminders = user.reminders.filter(active=True).select_related("habit")
+
+    for reminder in reminders:
         event = Event()
-        event.add("summary", f"Reminder: {habit.habit}")
-        event.add("dtstart", tz.localize(
-            datetime.now() + timedelta(minutes=5)))
-        event.add("dtend", tz.localize(datetime.now() + timedelta(minutes=35)))
-        event.add("description",
-                  f"Don't forget to complete your habit: {habit.habit}")
+        event.add("summary", f"Reminder: {reminder.habit.habit}")
+        event.add("dtstart", reminder.next_trigger_utc.astimezone(tz))
+        # Default duration: 30 mins
+        event.add("dtend", (reminder.next_trigger_utc +
+                  timedelta(minutes=30)).astimezone(tz))
+        event.add(
+            "description", f"Don't forget to complete your habit: {reminder.habit.habit}")
         cal.add_component(event)
 
-    return cal.to_ical
+    return cal.to_ical()
