@@ -33,9 +33,14 @@ def test_address_str():
 @pytest.mark.django_db
 def test_userprofile_timezone_resolution():
     user = User.objects.create_user(username="tester", password="pass123")
+
+    UserProfile.objects.filter(user=user).delete()
+
     profile = UserProfile.objects.create(
-        user=user, timezone="Africa/Johannesburg")
-    tz = profile.tz
+        user=user, timezone="Africa/Johannesburg"
+    )
+
+    tz = profile.tz()
     assert tz.key == "Africa/Johannesburg"
 
     # fallback to UTC for invalid timezone
@@ -46,8 +51,8 @@ def test_userprofile_timezone_resolution():
 @pytest.mark.django_db
 def test_userprofile_str():
     user = User.objects.create_user(username="notifyuser", password="pass123")
-    profile = UserProfile.objects.create(user=user)
-    assert str(profile) == "tester2's Profile."
+    profile, _ = UserProfile.objects.get_or_create(user=user)
+    assert str(profile) == f"{user.username}'s Profile."
 
 
 @pytest.mark.django_db

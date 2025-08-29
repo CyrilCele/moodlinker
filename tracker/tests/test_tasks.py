@@ -1,13 +1,12 @@
 import pytest
 
-from datetime import datetime, timedelta, time as dtime
+from datetime import datetime, timedelta
 from unittest.mock import patch
 from zoneinfo import ZoneInfo
 
-from django.conf import settings
 from django.utils import timezone
 
-from tracker.models import User, UserProfile, MoodEntry, Habit, HabitReminder, Notification
+from tracker.models import UserProfile, MoodEntry, Habit, HabitReminder
 from tracker.tasks import (
     send_low_mood_alert,
     schedule_user_habit_reminders,
@@ -24,15 +23,27 @@ from tracker.tasks import (
 def user(db, django_user_model):
     user = django_user_model.objects.create_user(
         username="tester", email="user@email.com", password="Pass123")
-    UserProfile.objects.create(
-        user=user, tz="UTC", notify_low_mood=True, low_mood_threshold=2, reminder_hour_local=9
+    profile, _ = UserProfile.objects.get_or_create(
+        user=user,
+        defaults={
+            "timezone": "UTC",
+            "notify_low_mood": True,
+            "low_mood_threshold": 2,
+            "reminder_hour_local": 9
+        }
     )
+    profile.timezone = "UTC"
+    profile.notify_low_mood = True
+    profile.low_mood_threshold = 2
+    profile.reminder_hour_local = 9
+    profile.save()
+
     return user
 
 
 @pytest.fixture
 def habit(user):
-    return Habit.objects.create(user=user, name="Drink Water", periodicity="daily")
+    return Habit.objects.create(user=user, habit="Drink Water", periodicity="daily")
 
 
 @pytest.fixture
@@ -45,7 +56,7 @@ def today():
 
 def test_build_next_local_dt_future_today(user):
     profile = user.profile
-    now = datetime.now(tz=ZoneInfo(profile.tz()))
+    now = datetime.now(tz=profile.tz())
     hour = (now.hour + 1) % 24  # ensure in future today
     next_dt = _build_next_local_dt(profile, hour)
     assert next_dt > timezone.now()
@@ -53,7 +64,7 @@ def test_build_next_local_dt_future_today(user):
 
 def test_build_next_local_dt_passed_hour_tomorrow(user):
     profile = user.profile
-    now = datetime.now(tz=ZoneInfo(profile.tz()))
+    now = datetime.now(tz=profile.tz())
     hour = (now.hour - 1) % 24  # past hour triggers tomorrow
     next_dt = _build_next_local_dt(profile, hour)
     assert next_dt.date() >= (timezone.now() + timedelta(days=0)).date()
@@ -119,7 +130,10 @@ def test_schedule_user_habit_reminders_updates_existing(user, habit):
 def test_process_due_reminders_sends_and_reschedules(mock_notify, user, habit):
     next_trigger = timezone.now() - timedelta(minutes=1)
     reminder = HabitReminder.objects.create(
-        user, habit=habit, next_trigger_utc=next_trigger, active=True
+        user=user,
+        habit=habit,
+        next_trigger_utc=next_trigger,
+        active=True
     )
     process_due_reminders()
     reminder.refresh_from_db()
@@ -147,7 +161,7 @@ def test_processes_due_reminders_handles_no_profile(mock_notify, user, habit):
 
 
 @pytest.mark.django_db
-@patch("tracker.services.send_reminder_email")
+@patch("tracker.tasks.send_reminder_email")
 def test_send_mood_reminder_calls_service(mock_send, user):
     send_mood_reminder(user.email, 1)  # low mood
     mock_send.assert_called_once()

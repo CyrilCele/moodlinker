@@ -52,13 +52,15 @@ class UserProfileForm(forms.ModelForm):
         self.fields["date_of_birth"].required = False
 
         # Populate address fields if address exists
-        if self.instance and self.instance.address:
+        if self.instance and getattr(self.instance, "address", None):
             address = self.instance.address
-            self.fields["street_address"].initial = address.street_address
-            self.fields["city"].initial = address.city
-            self.fields["state_province"].initial = address.state_province
-            self.fields["postal_code"].initial = address.postal_code
-            self.fields["country"].initial = address.country
+            self.initial.update({
+                "street_address": address.street_address,
+                "city": address.city,
+                "state_province": address.state_province,
+                "postal_code": address.postal_code,
+                "country": address.country
+            })
 
     def save(self, commit=True):
         profile = super().save(commit=False)
@@ -67,11 +69,16 @@ class UserProfileForm(forms.ModelForm):
         fields_to_preserve = ["bio", "date_of_birth",
                               "phone_number"]
 
+        # Fetch fresh values from DB
+        if profile.pk:
+            original = UserProfile.objects.get(pk=profile.pk)
+        else:
+            original = None
+
         for field in fields_to_preserve:
             form_value = self.cleaned_data.get(field)
-            if not self.cleaned_data.get(field):
-                existing_value = getattr(self.instance, field)
-                setattr(profile, field, existing_value)
+            if form_value in [None, ""] and original:
+                setattr(profile, field, getattr(original, field))
 
         # Save or update address
         address_data = {
@@ -85,7 +92,7 @@ class UserProfileForm(forms.ModelForm):
         if profile.address:
             for field, value in address_data.items():
                 # Preserve old value if input is empty
-                if not value:
+                if value in [None, ""]:
                     value = getattr(profile.address, field)
                 setattr(profile.address, field, value)
             profile.address.save()

@@ -2,6 +2,7 @@ import secrets
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -127,17 +128,17 @@ class Habit(models.Model):
 
 class MoodEntry(models.Model):
     MOOD_CHOICES = [
-        (1, "1 😢 Sad"),
-        (2, "2 😐 Meh"),
-        (3, "3 😊 Happy"),
-        (4, "4 😡 Angry"),
-        (5, "5 😴 Tired")
+        (1, "1 😡 Angry"),
+        (2, "2 😴 Tired"),
+        (3, "3 😢 Sad"),
+        (4, "4 😐 Meh"),
+        (5, "5 😊 Happy")
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     score = models.IntegerField(choices=MOOD_CHOICES)
     reflection = models.TextField(blank=True)
-    date = models.DateField(auto_now_add=True)
+    date = models.DateField(default=timezone.now)
 
     class Meta:
         unique_together = ("user", "date")

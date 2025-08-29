@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.utils import timezone
@@ -6,7 +7,7 @@ from tracker.models import User, UserProfile, MoodEntry, Habit
 from tracker.tasks import send_low_mood_alert, schedule_user_habit_reminders
 
 
-@receiver(post_save, sender=User)
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.create(user=instance)

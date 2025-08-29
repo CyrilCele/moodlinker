@@ -24,3 +24,6 @@ Thumbs.db
 
 # Pipenv
 Pipfile.lock
+
+# Pytest report
+report.html

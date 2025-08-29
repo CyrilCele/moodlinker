@@ -16,6 +16,7 @@ djangorestframework = "*"
 pyyaml = "*"
 pytest-django = "*"
 pytest-html = "*"
+pytest-mock = "*"
 
 [dev-packages]
 black = "*"

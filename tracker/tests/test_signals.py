@@ -1,6 +1,5 @@
 import pytest
 
-from django.db.models.signals import post_save, post_delete
 from django.utils import timezone
 
 from unittest.mock import patch
@@ -30,31 +29,33 @@ class TestMoodEntrySignals:
     def test_on_mood_saved_triggers_task_for_today(self, mock_task, django_user_model):
         user = django_user_model.objects.create_user(
             username="tester3", password="pass123")
-        mood = MoodEntry.objects.create(
-            user=user, mood="sad", date=timezone.now().date())
+        score = MoodEntry.objects.create(
+            user=user, score=1, date=timezone.now().date())
 
-        mock_task.assert_called_once_with(user.id, mood.id)
+        mock_task.assert_called_once_with(user.id, score.id)
 
     @patch("tracker.signals.send_low_mood_alert.delay")
     def test_on_mood_saved_does_not_trigger_for_past_date(self, mock_task, django_user_model):
         user = django_user_model.objects.create_user(
             username="tester4", password="pass123")
         yesterday = timezone.now().date() - timezone.timedelta(days=1)
-        MoodEntry.objects.create(user=user, mood="happy", date=yesterday)
+        mood = MoodEntry.objects.create(user=user, score=5, reflection="happy")
+        mood.date = yesterday
+        mood.save(update_fields=["date"])
 
         mock_task.assert_not_called()
 
-    @patch("tracker.signals,send_low_mood_alert.delay")
+    @patch("tracker.signals.send_low_mood_alert.delay")
     def test_on_mood_saved_does_not_trigger_on_update(self, mock_task, django_user_model):
         user = django_user_model.objects.create_user(
             username="tester5", password="pass123")
-        mood = MoodEntry.objects.create(
-            user=user, mood="neutral", date=timezone.now().date())
+        score = MoodEntry.objects.create(
+            user=user, score=2, date=timezone.now().date())
         mock_task.reset_mock()
 
         # Update existing entry (signal should NOT call)
-        mood.mood = "sad"
-        mood.save()
+        score.score = 2
+        score.save()
 
         mock_task.assert_not_called()
 
@@ -65,7 +66,7 @@ class TestHabitSignals:
     def test_on_habit_created_triggers_task(self, mock_task, django_user_model):
         user = django_user_model.objects.create_user(
             username="tester6", password="pass123")
-        habit = Habit.objects.create(user=user, name="Drink Water")
+        habit = Habit.objects.create(user=user, habit="Drink Water")
 
         mock_task.assert_called_once_with(user.id)
 
@@ -73,10 +74,10 @@ class TestHabitSignals:
     def test_on_habit_updated_triggers_task(self, mock_task, django_user_model):
         user = django_user_model.objects.create_user(
             username="tester7", password="pass123")
-        habit = Habit.objects.create(user=user, name="Run 5km")
+        habit = Habit.objects.create(user=user, habit="Run 5km")
         mock_task.reset_mock()
 
-        habit.name = "Run 10km"
+        habit.habit = "Run 10km"
         habit.save()
 
         mock_task.assert_called_once_with(user.id)
@@ -85,7 +86,7 @@ class TestHabitSignals:
     def test_on_habit_deleted_triggers_task(self, mock_task, django_user_model):
         user = django_user_model.objects.create_user(
             username="tester8", password="pass123")
-        habit = Habit.objects.create(user=user, name="Meditate")
+        habit = Habit.objects.create(user=user, habit="Meditate")
         mock_task.reset_mock()
 
         habit.delete()

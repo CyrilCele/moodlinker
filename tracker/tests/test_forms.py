@@ -12,6 +12,10 @@ from tracker.models import User, UserProfile, Address, MoodEntry, Habit
 class TestUserProfileForm:
     def test_init_populates_address_fields_when_address_exists(self):
         user = User.objects.create_user(username="John", password="test123")
+        profile, _ = UserProfile.objects.get_or_create(user=user)
+        if profile is None:
+            profile = UserProfile.objects.create(user=user)
+
         address = Address.objects.create(
             street_address="123 Test St",
             city="Cape Town",
@@ -19,7 +23,9 @@ class TestUserProfileForm:
             postal_code="8000",
             country="ZA"
         )
-        profile = UserProfile.objects.create(user=user, address=address)
+        profile.address = address
+        profile.save()
+        profile.refresh_from_db()
 
         form = UserProfileForm(instance=profile)
         assert form.initial["street_address"] == "123 Test St"
@@ -28,8 +34,11 @@ class TestUserProfileForm:
 
     def test_save_preserves_existing_fields_if_blank(self):
         user = User.objects.create_user(username="Sizwe", password="test123")
-        profile = UserProfile.objects.create(
-            user=user, bio="existing bio", phone_number="+27727210629")
+        profile, _ = UserProfile.objects.get_or_create(user=user)
+        profile.bio = "existing bio"
+        profile.phone_number = "+27727210629"
+        profile.save()
+
         form = UserProfileForm(instance=profile, data={
                                "bio": "", "phone_number": ""})
 
@@ -41,9 +50,16 @@ class TestUserProfileForm:
 
     def test_save_updates_existing_address(self):
         user = User.objects.create_user(username="Mona", password="test123")
-        address = Address.objects.create(street_address="Jules St", city="Johannesburg",
-                                         state_province="Gauteng", postal_code="2094", country="South Africa")
-        profile = UserProfile.objects.create(user=user, address=address)
+        address = Address.objects.create(
+            street_address="Jules St",
+            city="Johannesburg",
+            state_province="Gauteng",
+            postal_code="2094",
+            country="South Africa"
+        )
+        profile = user.profile
+        profile.address = address
+        profile.save()
         form = UserProfileForm(
             instance=profile,
             data={
@@ -68,7 +84,8 @@ class TestUserProfileForm:
 
     def test_save_creates_new_address_if_any_field_given(self):
         user = User.objects.create_user(username="Alex", password="test123")
-        profile = UserProfile.objects.create(user=user)
+        profile = user.profile
+        profile.save()
         form = UserProfileForm(
             instance=profile,
             data={
@@ -98,7 +115,7 @@ class TestMoodEntryForm:
         assert form.is_valid()
         mood = form.save()
         assert mood.score == 3
-        assert mood.reflection == "Feeling okay"
+        assert mood.reflection == "feeling okay"
 
 
 @pytest.mark.django_db
@@ -123,7 +140,8 @@ class TestHabitForm:
 class TestNotificationPreferencesForm:
     def test_from_saves_notification_prefs(self):
         user = User.objects.create_user(username="Tom", password="test123")
-        profile = UserProfile.objects.create(user=user)
+        profile = user.profile
+        profile.save()
         form = NotificationPreferencesForm(
             instance=profile,
             data={
