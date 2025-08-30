@@ -23,8 +23,10 @@ class HabitViewSet(viewsets.ModelViewSet):
     def completions(self, request, pk=None):
         habit = get_object_or_404(Habit, pk=pk, user=request.user)
         qs = HabitCompletion.objects.filter(
-            user=request.user, habit=habit).order_by("-date")
+            user=request.user, habit=habit
+        ).order_by("-date")
         serializer = HabitCompletionSerializer(qs, many=True)
+
         return Response(serializer.data)
 
 

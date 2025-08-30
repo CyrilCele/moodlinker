@@ -1,6 +1,5 @@
 import pytest
 from django.utils import timezone
-from rest_framework.exceptions import ValidationError
 
 from tracker.api.serializers import (
     HabitSerializer,
@@ -36,8 +35,11 @@ class TestHabitSerializer:
                   "periodicity": "daily"},
             context={"request": type("req", (), {"user": user})}
         )
+
         assert serializer.is_valid(), serializer.errors
+
         habit = serializer.save()
+
         assert habit.user == user
 
     def test_validate_rejects_more_than_five_habits(self, user):
@@ -53,6 +55,7 @@ class TestHabitSerializer:
                   "periodicity": "daily"},
             context={"request": type("req", (), {"user": user})}
         )
+
         assert not serializer.is_valid()
         assert "Limit of 5 habits" in str(serializer.errors)
 
@@ -71,8 +74,11 @@ class TestHabitSerializer:
             context={"request": type("req", (), {"user": user})},
             partial=True
         )
+
         assert serializer.is_valid(), serializer.errors
+
         updated = serializer.save()
+
         assert updated.habit == "Updated"
 
 
@@ -83,27 +89,33 @@ class TestMoodEntrySerializer:
             data={"score": 3, "reflection": "Feeling okay"},
             context={"request": type("req", (), {"user": user})}
         )
+
         assert serializer.is_valid(), serializer.errors
+
         mood = serializer.save()
+
         assert mood.user == user
         assert mood.date == timezone.localdate()
 
     def test_validate_rejects_multiple_entries_per_day(self, user):
         today = timezone.localdate()
         MoodEntry.objects.create(
-            user=user, score=2, reflection="First", date=today)
+            user=user, score=2, reflection="First", date=today
+        )
 
         serializer = MoodEntrySerializer(
             data={"score": 4, "reflection": "Second try"},
             context={"request": type("req", (), {"user": user})}
         )
+
         assert not serializer.is_valid()
         assert "Mood already logged for today" in str(serializer.errors)
 
     def test_update_allows_existing_mood_even_if_today_already_logged(self, user):
         today = timezone.localdate()
         mood = MoodEntry.objects.create(
-            user=user, score=2, reflection="First", date=today)
+            user=user, score=2, reflection="First", date=today
+        )
 
         serializer = MoodEntrySerializer(
             instance=mood,
@@ -111,8 +123,11 @@ class TestMoodEntrySerializer:
             context={"request": type("req", (), {"user": user})},
             partial=True
         )
+
         assert serializer.is_valid(), serializer.errors
+
         updated = serializer.save()
+
         assert updated.reflection == "Updated reflection"
 
     @pytest.mark.parametrize("score", [0, 6])
@@ -121,6 +136,7 @@ class TestMoodEntrySerializer:
             data={"score": score, "reflection": "meh"},
             context={"request": type("req", (), {"user": user})}
         )
+
         assert not serializer.is_valid()
         assert "Ensure this value" in str(serializer.errors)
 

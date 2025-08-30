@@ -13,6 +13,7 @@ class TestUserProfileForm:
     def test_init_populates_address_fields_when_address_exists(self):
         user = User.objects.create_user(username="John", password="test123")
         profile, _ = UserProfile.objects.get_or_create(user=user)
+
         if profile is None:
             profile = UserProfile.objects.create(user=user)
 
@@ -23,11 +24,13 @@ class TestUserProfileForm:
             postal_code="8000",
             country="ZA"
         )
+
         profile.address = address
         profile.save()
         profile.refresh_from_db()
 
         form = UserProfileForm(instance=profile)
+
         assert form.initial["street_address"] == "123 Test St"
         assert form.initial["city"] == "Cape Town"
         assert form.initial["state_province"] == "WC"
@@ -39,10 +42,12 @@ class TestUserProfileForm:
         profile.phone_number = "+27727210629"
         profile.save()
 
-        form = UserProfileForm(instance=profile, data={
-                               "bio": "", "phone_number": ""})
+        form = UserProfileForm(
+            instance=profile, data={"bio": "", "phone_number": ""}
+        )
 
         assert form.is_valid()
+
         updated = form.save()
 
         assert updated.bio == "existing bio"
@@ -50,6 +55,7 @@ class TestUserProfileForm:
 
     def test_save_updates_existing_address(self):
         user = User.objects.create_user(username="Mona", password="test123")
+
         address = Address.objects.create(
             street_address="Jules St",
             city="Johannesburg",
@@ -57,9 +63,11 @@ class TestUserProfileForm:
             postal_code="2094",
             country="South Africa"
         )
+
         profile = user.profile
         profile.address = address
         profile.save()
+
         form = UserProfileForm(
             instance=profile,
             data={
@@ -70,6 +78,7 @@ class TestUserProfileForm:
                 "country": "ZA"
             }
         )
+
         assert form.is_valid()
 
         updated = form.save()
@@ -86,6 +95,7 @@ class TestUserProfileForm:
         user = User.objects.create_user(username="Alex", password="test123")
         profile = user.profile
         profile.save()
+
         form = UserProfileForm(
             instance=profile,
             data={
@@ -93,7 +103,9 @@ class TestUserProfileForm:
                 "city": "Durban"
             }
         )
+
         assert form.is_valid()
+
         updated = form.save()
 
         assert updated.address is not None
@@ -105,6 +117,7 @@ class TestUserProfileForm:
 class TestMoodEntryForm:
     def test_form_accepts_valid_data(self):
         user = User.objects.create_user(username="Sam", password="test123")
+
         form = MoodEntryForm(
             data={
                 "score": 3,
@@ -112,8 +125,11 @@ class TestMoodEntryForm:
             },
             instance=MoodEntry(user=user)
         )
+
         assert form.is_valid()
+
         mood = form.save()
+
         assert mood.score == 3
         assert mood.reflection == "feeling okay"
 
@@ -122,6 +138,7 @@ class TestMoodEntryForm:
 class TestHabitForm:
     def test_form_accepts_valid_data(self):
         user = User.objects.create_user(username="Lily", password="test123")
+
         form = HabitForm(
             data={
                 "habit": "Meditation",
@@ -130,8 +147,11 @@ class TestHabitForm:
             },
             instance=Habit(user=user)
         )
+
         assert form.is_valid()
+
         habit = form.save()
+
         assert habit.habit == "Meditation"
         assert habit.periodicity == "daily"
 
@@ -142,6 +162,7 @@ class TestNotificationPreferencesForm:
         user = User.objects.create_user(username="Tom", password="test123")
         profile = user.profile
         profile.save()
+
         form = NotificationPreferencesForm(
             instance=profile,
             data={
@@ -151,7 +172,9 @@ class TestNotificationPreferencesForm:
                 "reminder_hour_local": 8
             }
         )
+
         assert form.is_valid()
+
         updated = form.save()
 
         assert updated.notify_low_mood is True

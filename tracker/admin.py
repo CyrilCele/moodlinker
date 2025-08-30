@@ -4,8 +4,9 @@ from .models import User, UserProfile, Habit, MoodEntry, HabitCompletion, Addres
 
 
 class AddressAdmin(admin.ModelAdmin):
-    list_display = ["street_address", "city",
-                    "state_province", "postal_code", "country"]
+    list_display = [
+        "street_address", "city", "state_province", "postal_code", "country"
+    ]
 
 
 class UserProfileAdmin(admin.ModelAdmin):

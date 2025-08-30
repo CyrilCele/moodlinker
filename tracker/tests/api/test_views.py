@@ -24,6 +24,7 @@ def other_user(django_user_model):
 @pytest.fixture
 def auth_client(api_client, user):
     api_client.force_authenticate(user=user)
+
     return api_client
 
 
@@ -62,8 +63,8 @@ class TestHabitViewSet:
     def test_user_only_sees_own_habits(self, auth_client, habit, other_habit):
         url = reverse("habits-list")
         response = auth_client.get(url)
-
         names = [habit["habit"] for habit in response.data]
+
         assert habit.habit in names
         assert other_habit.habit not in names
 
@@ -86,6 +87,7 @@ class TestHabitViewSet:
     def test_user_cannot_access_other_users_habit(self, auth_client, other_habit):
         url = reverse("habits-detail", args=[other_habit.id])
         response = auth_client.get(url)
+
         assert response.status_code == 404
 
     def test_habit_completions_endpoint_returns_only_own_data(
@@ -110,6 +112,7 @@ class TestHabitViewSet:
         # completions for other user habit -> 404
         url = reverse("habits-completions", args=[other_habit.id])
         response = auth_client.get(url)
+
         assert response.status_code == 404
 
 
@@ -118,15 +121,16 @@ class TestMoodEntryViewSet:
     def test_user_only_sees_own_moods(self, auth_client, mood_entry, other_mood):
         url = reverse("moods-list")
         response = auth_client.get(url)
-
         moods = [score["score"] for score in response.data]
+
         assert int(mood_entry.score) in moods
         assert int(other_mood.score) not in moods
 
     def test_user_can_create_mood(self, auth_client):
         url = reverse("moods-list")
-        payload = {"score": "3", "reflection": "Tough day",
-                   "date": timezone.now().date().isoformat()}
+        payload = {
+            "score": "3", "reflection": "Tough day", "date": timezone.now().date().isoformat()
+        }
         response = auth_client.post(url, payload)
 
         assert response.status_code == 201
@@ -143,4 +147,5 @@ class TestMoodEntryViewSet:
     def test_user_cannot_access_other_users_mood(self, auth_client, other_mood):
         url = reverse("moods-detail", args=[other_mood.id])
         response = auth_client.get(url)
+
         assert response.status_code == 404

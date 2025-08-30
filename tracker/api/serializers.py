@@ -15,16 +15,22 @@ class HabitSerializer(serializers.ModelSerializer):
         For update, we allow changes to fields; uniqueness of (user, habit) enforced by DB.
         """
         user = self.context["request"].user
+
         if self.instance is None:
+
             # Create path: check count
             current_count = Habit.objects.filter(user=user).count()
+
             if current_count >= 5:
                 raise serializers.ValidationError(
-                    "Limit of 5 habits reached for this user.")
+                    "Limit of 5 habits reached for this user."
+                )
+
         return data
 
     def create(self, validated_data):
         validated_data["user"] = self.context["request"].user
+
         return super().create(validated_data)
 
 
@@ -38,19 +44,24 @@ class MoodEntrySerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "date"]
 
     def validate(self, data):
+
         # Prevent multiple mood entries per user per day
         user = self.context["request"].user
         today = timezone.localdate()
         exists = MoodEntry.objects.filter(user=user, date=today).exists()
+
         # If we are updating existing instance, allow it (user can patch existing record)
         if self.instance is None and exists:
             raise serializers.ValidationError(
-                "Mood already logged for today.")
+                "Mood already logged for today."
+            )
+
         return data
 
     def create(self, validated_data):
         validated_data["user"] = self.context["request"].user
         validated_data.setdefault("date", timezone.now().date())
+
         return super().create(validated_data)
 
 

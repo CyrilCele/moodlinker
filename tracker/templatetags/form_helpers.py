@@ -14,6 +14,8 @@ def add_class(field, css_class):
 def add_disabled(field, condition):
     if isinstance(field, SafeString):
         return field  # It's already rendered HTML; can't modify
+
     if condition:
         field.field.widget.attrs["disabled"] = "disabled"
+
     return field

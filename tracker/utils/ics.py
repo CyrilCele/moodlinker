@@ -17,13 +17,16 @@ def generate_ics(user):
 
     for reminder in reminders:
         event = Event()
+
         event.add("summary", f"Reminder: {reminder.habit.habit}")
         event.add("dtstart", reminder.next_trigger_utc.astimezone(tz))
         # Default duration: 30 mins
         event.add("dtend", (reminder.next_trigger_utc +
                   timedelta(minutes=30)).astimezone(tz))
         event.add(
-            "description", f"Don't forget to complete your habit: {reminder.habit.habit}")
+            "description", f"Don't forget to complete your habit: {reminder.habit.habit}"
+        )
+
         cal.add_component(event)
 
     return cal.to_ical()

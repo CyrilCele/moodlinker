@@ -8,21 +8,25 @@ class UserProfileForm(forms.ModelForm):
         widget=forms.TextInput(
             attrs={"class": "form-control text-white bg-dark p-2"})
     )
+
     city = forms.CharField(
         required=False,
         widget=forms.TextInput(
             attrs={"class": "form-control text-white bg-dark p-2"})
     )
+
     state_province = forms.CharField(
         required=False,
         widget=forms.TextInput(
             attrs={"class": "form-control text-white bg-dark p-2"})
     )
+
     postal_code = forms.CharField(
         required=False,
         widget=forms.TextInput(
             attrs={"class": "form-control text-white bg-dark p-2"})
     )
+
     country = forms.CharField(
         required=False,
         widget=forms.TextInput(
@@ -66,8 +70,9 @@ class UserProfileForm(forms.ModelForm):
         profile = super().save(commit=False)
 
         # List of fields to preserve if empty
-        fields_to_preserve = ["bio", "date_of_birth",
-                              "phone_number"]
+        fields_to_preserve = [
+            "bio", "date_of_birth", "phone_number"
+        ]
 
         # Fetch fresh values from DB
         if profile.pk:
@@ -77,6 +82,7 @@ class UserProfileForm(forms.ModelForm):
 
         for field in fields_to_preserve:
             form_value = self.cleaned_data.get(field)
+
             if form_value in [None, ""] and original:
                 setattr(profile, field, getattr(original, field))
 
@@ -95,7 +101,9 @@ class UserProfileForm(forms.ModelForm):
                 if value in [None, ""]:
                     value = getattr(profile.address, field)
                 setattr(profile.address, field, value)
+
             profile.address.save()
+
         else:
             # Only create address if at least one value is filled
             if any(address_data.values()):

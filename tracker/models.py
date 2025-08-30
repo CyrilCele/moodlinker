@@ -1,11 +1,11 @@
 import secrets
+
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 
 from phonenumber_field.modelfields import PhoneNumberField
-
 from zoneinfo import ZoneInfo
 
 
@@ -19,7 +19,8 @@ PERIODICITY_CHOICES = [
 class User(AbstractUser):
     timezone = models.CharField(max_length=50, default="UTC")
     calendar_token = models.CharField(
-        max_length=64, unique=True, blank=True, null=True)
+        max_length=64, unique=True, blank=True, null=True
+    )
 
     def save(self, *args, **kwargs):
         if not self.calendar_token:
@@ -40,23 +41,32 @@ class Address(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile")
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile"
+    )
+
     address = models.ForeignKey(
-        Address, blank=True, null=True, on_delete=models.SET_NULL, related_name="profiles")
+        Address, blank=True, null=True, on_delete=models.SET_NULL, related_name="profiles"
+    )
+
     bio = models.TextField(blank=True)
+
     avatar = models.ImageField(
-        upload_to="profile_pics/", null=True, blank=True)
+        upload_to="profile_pics/", null=True, blank=True
+    )
+
     date_of_birth = models.DateField(null=True, blank=True)
     phone_number = PhoneNumberField(region="ZA", blank=True, null=True)
 
     # Notifications & timezone
     notify_low_mood = models.BooleanField(default=True)
     low_mood_threshold = models.PositiveSmallIntegerField(
-        default=2)    # 1-5 scale; alert if mood <= threshold
+        default=2
+    )    # 1-5 scale; alert if mood <= threshold
     # e.g "America/New_York"
     timezone = models.CharField(max_length=64, default="UTC")
     reminder_hour_local = models.PositiveSmallIntegerField(
-        default=9)   # 0-23 local time
+        default=9
+    )   # 0-23 local time
 
     def tz(self) -> ZoneInfo:
         try:
@@ -70,7 +80,9 @@ class UserProfile(models.Model):
 
 class Notification(models.Model):
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications")
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications"
+    )
+
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     read = models.BooleanField(default=False)
@@ -88,10 +100,14 @@ class HabitReminder(models.Model):
     """
     Tracks the next time we should remind a user for a habit (local-time aware).
     """
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE, related_name="reminders")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="reminders"
+    )
+
     habit = models.ForeignKey(
-        "Habit", on_delete=models.CASCADE, related_name="reminders")
+        "Habit", on_delete=models.CASCADE, related_name="reminders"
+    )
+
     next_trigger_utc = models.DateTimeField()
     active = models.BooleanField(default=True)
 
@@ -105,7 +121,9 @@ class HabitReminder(models.Model):
 
 class Habit(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="habits")
+        User, on_delete=models.CASCADE, related_name="habits"
+    )
+
     habit = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     periodicity = models.CharField(max_length=10, choices=PERIODICITY_CHOICES)
@@ -115,7 +133,8 @@ class Habit(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["user", "habit"], name="unique_user_habit")
+                fields=["user", "habit"], name="unique_user_habit"
+            )
         ]
 
     def __str__(self):

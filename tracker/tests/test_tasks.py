@@ -2,7 +2,6 @@ import pytest
 
 from datetime import datetime, timedelta
 from unittest.mock import patch
-from zoneinfo import ZoneInfo
 
 from django.utils import timezone
 
@@ -22,7 +21,9 @@ from tracker.tasks import (
 @pytest.fixture
 def user(db, django_user_model):
     user = django_user_model.objects.create_user(
-        username="tester", email="user@email.com", password="Pass123")
+        username="tester", email="user@email.com", password="Pass123"
+    )
+
     profile, _ = UserProfile.objects.get_or_create(
         user=user,
         defaults={
@@ -32,6 +33,7 @@ def user(db, django_user_model):
             "reminder_hour_local": 9
         }
     )
+
     profile.timezone = "UTC"
     profile.notify_low_mood = True
     profile.low_mood_threshold = 2
@@ -59,6 +61,7 @@ def test_build_next_local_dt_future_today(user):
     now = datetime.now(tz=profile.tz())
     hour = (now.hour + 1) % 24  # ensure in future today
     next_dt = _build_next_local_dt(profile, hour)
+
     assert next_dt > timezone.now()
 
 
@@ -67,6 +70,7 @@ def test_build_next_local_dt_passed_hour_tomorrow(user):
     now = datetime.now(tz=profile.tz())
     hour = (now.hour - 1) % 24  # past hour triggers tomorrow
     next_dt = _build_next_local_dt(profile, hour)
+
     assert next_dt.date() >= (timezone.now() + timedelta(days=0)).date()
 
 
@@ -77,9 +81,12 @@ def test_build_next_local_dt_passed_hour_tomorrow(user):
 @patch("tracker.tasks._notify")
 def test_send_low_mood_alert_triggers_notification(mock_testify, user, today):
     mood = MoodEntry.objects.create(user=user, date=today, score=1)
+
     send_low_mood_alert(user.id, mood.id)
     mock_testify.assert_called_once()
+
     args, kwargs = mock_testify.call_args
+
     assert "Be kind to yourself" in args[1]
     assert kwargs["email"] is True
 
@@ -88,6 +95,7 @@ def test_send_low_mood_alert_triggers_notification(mock_testify, user, today):
 @patch("tracker.tasks._notify")
 def test_send_low_mood_alert_no_trigger_above_threshold(mock_notify, user, today):
     mood = MoodEntry.objects.create(user=user, date=today, score=5)
+
     send_low_mood_alert(user.id, mood.id)
     mock_notify.assert_not_called()
 
@@ -106,6 +114,7 @@ def test_send_low_mood_alert_invalid_entry(user):
 def test_schedule_user_habit_reminders_creates_entries(user, habit):
     schedule_user_habit_reminders(user.id)
     reminder = HabitReminder.objects.get(user=user, habit=habit)
+
     assert reminder.active is True
     assert reminder.next_trigger_utc is not None
 
@@ -116,8 +125,10 @@ def test_schedule_user_habit_reminders_updates_existing(user, habit):
     old_reminder = HabitReminder.objects.create(
         user=user, habit=habit, next_trigger_utc=timezone.now() - timedelta(days=1), active=False
     )
+
     schedule_user_habit_reminders(user.id)
     old_reminder.refresh_from_db()
+
     assert old_reminder.active is True
     assert old_reminder.next_trigger_utc > timezone.now()
 
@@ -135,9 +146,11 @@ def test_process_due_reminders_sends_and_reschedules(mock_notify, user, habit):
         next_trigger_utc=next_trigger,
         active=True
     )
+
     process_due_reminders()
     reminder.refresh_from_db()
     mock_notify.assert_called_once()
+
     assert reminder.next_trigger_utc > timezone.now()
 
 
@@ -150,11 +163,13 @@ def test_processes_due_reminders_handles_no_profile(mock_notify, user, habit):
     reminder = HabitReminder.objects.create(
         user=user, habit=habit, next_trigger_utc=next_trigger, active=True
     )
+
     process_due_reminders()
     reminder.refresh_from_db()
     mock_notify.assert_called_once()
-    assert reminder.next_trigger_utc.date() == (
-        timezone.now() + timedelta(days=1)).date()
+
+    assert reminder.next_trigger_utc.date() == \
+        (timezone.now() + timedelta(days=1)).date()
 
 
 # ---------- SEND MOOD REMINDER ----------
@@ -166,9 +181,11 @@ def test_send_mood_reminder_calls_service(mock_send, user):
     send_mood_reminder(user.email, 1)  # low mood
     mock_send.assert_called_once()
     args, kwargs = mock_send.call_args
+
     assert "low" in args[2].lower() or "lift your spirits" in args[2]
 
     mock_send.reset_mock()
     send_mood_reminder(user.email, 4)  # high mood
     args, kwargs = mock_send.call_args
+
     assert "keep up" in args[2].lower() or "good work" in args[2]

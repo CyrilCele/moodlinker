@@ -1,11 +1,12 @@
 import yaml
-from pathlib import Path
-from django.core.mail import send_mail
-from django.conf import settings
+
 from collections import defaultdict
 from datetime import timedelta
+from pathlib import Path
 from statistics import mean
 
+from django.core.mail import send_mail
+from django.conf import settings
 from django.utils import timezone
 
 from nltk.sentiment import SentimentIntensityAnalyzer
@@ -22,14 +23,18 @@ class AnalyticsService:
         today = timezone.now().date()
         streak = 0
         day = today
+
         while True:
             exists = HabitCompletion.objects.filter(
                 user=user, habit=habit, date=day, completed=True
             ).exists()
+
             if not exists:
                 break
+
             streak += 1
             day -= timedelta(days=1)
+
         return streak
 
     @staticmethod
@@ -42,8 +47,10 @@ class AnalyticsService:
         def completion_rate(d0, d1) -> float:
             # completed count / total habits for the given day range
             habits = Habit.objects.filter(user=user).count()
+
             if habits == 0:
                 return 0.0
+
             completions = HabitCompletion.objects.filter(
                 user=user, date__range=(d0, d1), completed=True
             ).count()
@@ -55,15 +62,19 @@ class AnalyticsService:
             # Last 7 days, by day
             start = today - timedelta(days=6)
             labels, moods, rates = [], [], []
+
             for i in range(7):
                 day = start + timedelta(days=i)
                 labels.append(day.strftime("%b %d"))
                 day_moods = list(
                     MoodEntry.objects.filter(
-                        user=user, date=day).values_list("score", flat=True)
+                        user=user, date=day).values_list("score", flat=True
+                                                         )
                 )
+
                 moods.append(mean(day_moods) if day_moods else 0)
                 rates.append(completion_rate(day, day))
+
             return labels, moods, rates
 
         if view == "monthly":
@@ -71,41 +82,55 @@ class AnalyticsService:
             start = today.replace(day=1)
             days_in_month = (today.replace(month=today.month % 12 + 1, day=1) - timedelta(days=1)).day \
                 if today.month != 12 else 31
+
             labels, moods, rates = [], [], []
+
             for daynum in range(1, days_in_month + 1):
                 day = start.replace(day=daynum)
+
                 if day > today:  # future days
                     break
+
                 labels.append(day.strftime("%d %b"))
                 day_moods = list(
                     MoodEntry.objects.filter(
-                        user=user, date=day).values_list("score", flat=True)
+                        user=user, date=day).values_list("score", flat=True
+                                                         )
                 )
+
                 moods.append(mean(day_moods) if day_moods else 0)
                 rates.append(completion_rate(day, day))
+
             return labels, moods, rates
 
         # weekly (default): last 7 days, bucketed by weekday
         start = today - timedelta(days=6)
         entries = MoodEntry.objects.filter(
-            user=user, date__gte=start, date__lte=today)
+            user=user, date__gte=start, date__lte=today
+        )
         mood_map = defaultdict(list)
+
         for entry in entries:
             mood_map[entry.date.strftime("%A")].append(entry.score)
 
-        week_days = ["Monday", "Tuesday", "Wednesday",
-                     "Thursday", "Friday", "Saturday", "Sunday"]
+        week_days = [
+            "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+        ]
         labels = week_days
-        moods = [round(mean(mood_map[day]), 2) if mood_map[day]
-                 else 0 for day in week_days]
+        moods = [
+            round(mean(mood_map[day]), 2) if mood_map[day] else 0 for day in week_days
+        ]
 
         # completion rate per weekday (averaged across observed days)
         rate_map = defaultdict(list)
+
         for i in range(7):
             day = start + timedelta(days=i)
             rate_map[day.strftime("%A")].append(completion_rate(day, day))
-        rates = [round(mean(rate_map[day]), 1) if rate_map[day]
-                 else 0 for day in week_days]
+
+        rates = [
+            round(mean(rate_map[day]), 1) if rate_map[day] else 0 for day in week_days
+        ]
 
         return labels, moods, rates
 
@@ -125,12 +150,14 @@ class AISuggestionService:
                 import nltk
                 nltk.download("vader_lexicon")
                 cls._analyzer = SentimentIntensityAnalyzer()
+
         return cls._analyzer
 
     @classmethod
     def analyze_reflection(cls, text: str) -> float:
         if not text:
             return 0.0
+
         analyzer = cls._get_analyzer()
         scores = analyzer.polarity_scores(text or "")
         # compund in [-1, 1]
@@ -143,14 +170,22 @@ class AISuggestionService:
         then offer 1-2 actionable suggestions.
         """
         today = timezone.now().date()
-        recent = list(MoodEntry.objects.filter(
-            user=user, date__lte=today).order_by("-date")[:7])
+        recent = list(
+            MoodEntry.objects.filter(
+                user=user, date__lte=today
+            ).order_by("-date")[:7]
+        )
+
         if not recent:
             return "Log a mood today to unlock personalized tips."
 
         # sentiment on today's reflection if exists
         today_ref = next(
-            (entry.reflection for entry in recent if entry.date == today and entry.reflection), "")
+            (
+                entry.reflection for entry in recent if entry.date == today and entry.reflection
+            ), ""
+        )
+
         mood_sent = cls.analyze_reflection(today_ref)
 
         # average mood
@@ -158,12 +193,16 @@ class AISuggestionService:
 
         # find a weak weekday pattern (very simple heuristic)
         by_weekday = defaultdict(list)
+
         for entry in recent:
             by_weekday[entry.date.strftime("%A")].append(entry.score)
-        low_day = min(by_weekday, key=lambda day: mean(
-            by_weekday[day])) if by_weekday else None
+
+        low_day = min(
+            by_weekday, key=lambda day: mean(by_weekday[day])
+        ) if by_weekday else None
 
         suggestion = []
+
         if low_day:
             suggestion.append(
                 f"Your motivation dips on {low_day}s. Consider a low-effort habit that day (e.g., 5-minute walk)."
@@ -171,36 +210,42 @@ class AISuggestionService:
 
         if mood_sent < -0.2:
             suggestion.append(
-                "Your reflection sounds stressed. Try box breathing for 2 minutes.")
+                "Your reflection sounds stressed. Try box breathing for 2 minutes."
+            )
+
         elif avg_mood <= 2:
             suggestion.append(
-                "Mood's been low. Queue a tiny win: drink water and 10 deep breaths.")
+                "Mood's been low. Queue a tiny win: drink water and 10 deep breaths."
+            )
+
         elif avg_mood >= 4:
             suggestion.append(
-                "Riding high! Level up a habit today (add one more rep/minute).")
+                "Riding high! Level up a habit today (add one more rep/minute)."
+            )
 
         if not suggestion:
             suggestion.append(
-                "Keep the streak alive. Aim for one simple habit before noon.")
+                "Keep the streak alive. Aim for one simple habit before noon."
+            )
 
         return " ".join(suggestion)
 
 
-# Demo reminder
-def send_reminder_email(to_email, subject, message):
-    """
-    Sends a reminder/notification email using Gmail SMTP.
-    """
-    send_mail(
-        subject,
-        message,
-        settings.DEFAULT_FROM_EMAIL,
-        [to_email],
-        fail_silently=False,
-    )
+# def send_reminder_email(to_email, subject, message):
+#     """
+#     Sends a reminder/notification email using Gmail SMTP.
+#     """
+#     send_mail(
+#         subject,
+#         message,
+#         settings.DEFAULT_FROM_EMAIL,
+#         [to_email],
+#         fail_silently=False,
+#     )
 
 
-AI_CONFIG_PATH = Path(__file__).resolve().parent.parent / \
-    "config" / "ai_rules.yaml"
-with open(AI_CONFIG_PATH, "r") as fh:
-    AI_RULES = yaml.safe_load(fh)
+# AI_CONFIG_PATH = Path(__file__).resolve().parent.parent / \
+#     "config" / "ai_rules.yaml"
+
+# with open(AI_CONFIG_PATH, "r") as fh:
+#     AI_RULES = yaml.safe_load(fh)

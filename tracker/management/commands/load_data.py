@@ -13,8 +13,9 @@ class Command(BaseCommand):
     help = "Load JSON test fixtures for habits, mood entries, and completions"
 
     def add_arguments(self, parser):
-        parser.add_argument("filepath", type=str,
-                            help="Path to JSON fixture file")
+        parser.add_argument(
+            "filepath", type=str, help="Path to JSON fixture file"
+        )
 
     def handle(self, *args, **options):
         path = options["filepath"]
@@ -27,11 +28,14 @@ class Command(BaseCommand):
                 user, created = User.objects.get_or_create(username=username, defaults={
                     "email": user_data.get("email", f"{username}@example.com")
                 })
+
                 if created and "password" in user_data:
                     user.set_password(user_data["password"])
                     user.save()
+
                 # create habits
                 habits_map = {}
+
                 for habit in user_data.get("habits", []):
                     habit_obj, _ = Habit.objects.get_or_create(user=user, habit=habit["habit"], defaults={
                         "description": habit.get("description", ""),
@@ -51,8 +55,10 @@ class Command(BaseCommand):
             for comp in user_data.get("completions", []):
                 date = parse_date(comp["date"])
                 habit_obj = habits_map.get(comp["habit"])
+
                 if not habit_obj:
                     continue
+
                 HabitCompletion.objects.update_or_create(
                     user=user, habit=habit_obj, date=date,
                     defaults={"completed": comp.get("completed", False)}
