@@ -1,43 +1,75 @@
+/* ============================================================
+   Hero & core layout
+   ============================================================ */
 .hero {
+    /* Make the hero section at least full viewport height */
     min-height: 100vh;
+
+    /* Use Flexbox to center children vertically and stack them */
     display: flex;
     flex-direction: column;
     justify-content: center;
+
+    /* Center inline text horizontally */
     text-align: center;
 }
 
+/* ============================================================
+   Buttons
+   ============================================================ */
 .btn-primary, .btn-outline-light {
+    /* Space around buttons so they don't touch */
     margin: 10px;
+
+    /* Make text visually strong */
     font-weight: bold;
+
+    /* Slightly larger text for emphasis */
     font-size: 1.1rem;
 }
 
+/* ============================================================
+   Tagline / subheading
+   ============================================================ */
 .tagline {
-    font-size: 1.2rem;
-    margin-top: 1rem;
-    opacity: 0.9;
+    font-size: 1.2rem; /* readeable subtitle size */
+    margin-top: 1rem;  /* separation from main heading */
+    opacity: 0.9;      /* subtle fade for less visual weight */
 }
 
+/* ============================================================
+   Color input styling
+   ============================================================ */
 input#color {
+    /* Text color inside the input - dark green for contrast on light backgrounds */
     color: rgb(3, 49, 26);
+
+    /* Extra-bold to show hex or color label boldly */
     font-weight: 800;
 }
 
+/* ============================================================
+   Strong links (IDs used in HTML: #text, #moodlinker, #habits)
+   Note: Using IDs increases specificity; consider switchiong
+   to classes if you deem necessary.
+   ============================================================ */
 a#text,
 a#moodlinker {
     font-weight: 800;
 }
 
+/* Hover states - visual affordances on mouse hover */
 a#text:hover {
     background-color: brown;
     color: beige;
-    border-radius: 2rem;
+    border-radius: 2rem; /* rounded pill on hover */
 }
 
 a#moodlinker:hover {
     color: brown;
 }
 
+/* Habits link: default and hover */
 a#habits {
     text-decoration: none;
     color: #fff;
@@ -45,9 +77,12 @@ a#habits {
 
 a#habits:hover {
     color: blue;
-    font-size: 1.2rem;
+    font-size: 1.2rem; /* WARNING: increases layout size on hover - prefer transform: scale() */
 }
 
+/* ============================================================
+   Clock dispaly (large, readable)
+   ============================================================ */
 .clock {
     font-size: 1.5rem;
     font-weight: bold;
