@@ -29,7 +29,7 @@ def get_item(queryset: Iterable[Any], habit_id: Any) -> Optional[Any]:
             - `None` if no matching item is found or if `quetryset` is falsy.
 
     Exceptions:
-        - The function is defensive by design and aims *not* to raise inside templates.
+        - The function is defensive by design and aims not to raise inside templates.
           However, if `queryset` is not iterable, Python will raise `TypeError`.
         - If an unexpected error occurs during filter/iteration, the function will skip the
           problematic item and continue. Only fatal errors (non-iterable `queryset`) will bubble.

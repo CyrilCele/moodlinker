@@ -19,7 +19,7 @@
  * Initialize the toggle button and default theme once DOM is ready.
  * 
  * - Set default `data-bs-theme="dark"` on <html> if not already present.
- * - Updates the theme toggle button label to reflect the *opposite* theme,
+ * - Updates the theme toggle button label to reflect the opposite theme,
  *   because button text indicates the action (e.g. "Light" when in dark mode).
  * 
  * No parameters

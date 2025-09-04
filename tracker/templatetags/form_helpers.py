@@ -52,7 +52,7 @@ def add_class(field: Any, css_class: str) -> Any:
         {{ form.email|add_class:"form-control mb-2" }}
 
     Notes / edge cases:
-        - This function prefers **not** to mutate `field.field.widget.attrs` directly.
+        - This function prefers not to mutate `field.field.widget.attrs` directly.
           Instead it passes `attrs` to `as_widget()`, which only affects the current
           render call. That reduces (but does not eliminate) risk of side effects.
         - If the widget already has the same class, the class may be duplicated.
@@ -107,7 +107,7 @@ def add_disabled(field: Any, condition: Any) -> Any:
 
     Important notes / side effects:
         - THIS FUNCTION MUTATES `field.field.widget.attrs` directly when `condition` is truthy.
-          That is a **side effect**: the widget instance keeps the disabled attribute for
+          That is a side effect: the widget instance keeps the disabled attribute for
           subsequent renders, which can be surprising if the same widget instance is reused.
         - If you prefer a pure (non-mutating) approach use:
           `field.as_widget(attrs={"disabled": "disabled"})`

@@ -166,12 +166,12 @@ def test_summaries_monthly(user, habit, today):
     labels, moods, rates = AnalyticsService.summaries(user, view="monthly")
 
     assert labels, "Monthly labels should not be empty"
-    assert labels[-1] == today.strftime(
-        "%d %b"), f"Expected last label to be today ({labels[-1]})"
-    assert float(
-        moods[-1]) == 4.0, f"Expected today's mood avg 4.0, got {moods[-1]}"
-    assert all(isinstance(rate, float)
-               for rate in rates), "Completion rates should be floats"
+    assert labels[-1] == today.strftime("%d %b"), \
+        f"Expected last label to be today ({labels[-1]})"
+    assert float(moods[-1]) == 4.0, \
+        f"Expected today's mood avg 4.0, got {moods[-1]}"
+    assert all(isinstance(rate, float) for rate in rates), \
+        "Completion rates should be floats"
 
 
 @pytest.mark.django_db

@@ -327,7 +327,7 @@ class Habit(models.Model):
             ...     raise ValidationError("Limit of 5 habits reached.")
 
         Notes:
-            - This is **not** a hard databese constraint; it should be checked in forms/views/services
+            - This is not a hard databese constraint; it should be checked in forms/views/services
               to enforce the rule.
             - For absolute enforcement, consider soft blocks in business logic plus monitoring.
         """

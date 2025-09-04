@@ -7,7 +7,7 @@ This module centralizes:
 - Periodic processing of due reminders and nightly rebuilds.
 
 Key concepts:
-- All scheduling uses the **user's local time** to compute the next HH:00,
+- All scheduling uses the user's local time to compute the next HH:00,
   then converts that instant to UTC to store in `HabitReminder.next_trigger_utc`.
 - Celery tasks are idempotent(ish) and defensive: if required rows or profiles
   are missing, they no-op rather than crash.
@@ -72,8 +72,8 @@ def _build_next_local_dt(profile: UserProfile, hour: int) -> datetime:
     """
     Compute the next occurrence of HH:00 in the user's local timezone and return it as UTC.
 
-    The function picks either **today at HH:00** (if still in the future) or
-    **tomorrow at HH:00** (if today HH:00 has already passed), then converts the
+    The function picks either today at HH:00 (if still in the future) or
+    tomorrow at HH:00 (if today HH:00 has already passed), then converts the
     resulting local time to a UTC-aware datetime.
 
     Args:
@@ -92,7 +92,7 @@ def _build_next_local_dt(profile: UserProfile, hour: int) -> datetime:
         datetime(2025, 8, 30, 18, 0, tzinfo=zoneinfo.ZoneInfo('UTC'))
 
     Edge Cases:
-        - **DST transitions.** Using `ZoneInfo`, constructing a wall clock
+        - DST transitions. Using `ZoneInfo`, constructing a wall clock
           datetime may be ambiguous/nonexisting around DST changes. The direct
           `tzinfo=` attach uses `fold=0` by default. If you need stricter handling,
           consider computing by date + hour and letting the conversion resolve.
@@ -110,7 +110,7 @@ def _build_next_local_dt(profile: UserProfile, hour: int) -> datetime:
 
     local_now = _user_local_now(profile)
 
-    # Construct the *local* target at HH:00 (no minutes/seconds).
+    # Construct the local target at HH:00 (no minutes/seconds).
     candidate = datetime.combine(
         local_now.date(), dtime(hour=hour), tzinfo=profile.tz()
     )
@@ -324,7 +324,7 @@ def process_due_reminders():
             c. Save only the field that changed (`update_fields=["next_trigger_utc"]`).
 
     Edge Cases:
-        - **Double sends** can occur if multiple workers pick up the same row at the
+        - Double sends can occur if multiple workers pick up the same row at the
             same time. See improvements section for locking/atomic update suggestions.
         - If the user's timezone or reminder hour changes between cycles, the next
             trigger will reflect the *new* settings upon rescheduling.
