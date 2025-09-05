@@ -268,8 +268,8 @@ class TestMoodEntryViewSet:
         assert resp.status_code == status.HTTP_200_OK, resp.data
         scores = [row["score"] for row in resp.data]
 
-        assert mood_entry.score in scores
-        assert other_mood.score not in scores
+        assert int(mood_entry.score) in scores
+        assert int(other_mood.score) not in scores
 
     def test_user_can_create_mood(self, auth_client: APIClient) -> None:
         """

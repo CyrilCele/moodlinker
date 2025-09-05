@@ -10,14 +10,21 @@ This module verifies:
     - Calendar ICS feed
 """
 
-from typing import Any
+from typing import Type
 
 import pytest
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone
 
-from tracker.models import Habit, HabitCompletion, MoodEntry, Notification
+from tracker.models import (
+    User,
+    UserProfile,
+    Habit,
+    HabitCompletion,
+    MoodEntry,
+    Notification
+)
 
 User = get_user_model()
 
@@ -29,22 +36,20 @@ pytestmark = pytest.mark.django_db
 # Fixtures
 # --------------------
 @pytest.fixture
-def user(django_user_model: Any) -> User:
+def user(django_user_model: Type[User]) -> User:
     """
     Create a test user and ensure the related UserProfile exists.
 
     Returns
     -------
     User
-        Auth-capable user instance with an attached profile.
+        Test user instance with an associated profile.
     """
     user = django_user_model.objects.create_user(
-        username="tester", email="test@example.com", password="pass1234"
+        username="tester",
+        email="test@example.com",
+        password="pass1234"
     )
-
-    # Ensure the associated profile exists (signals normally create this).
-    from tracker.models import UserProfile
-
     UserProfile.objects.get_or_create(user=user)
     return user
 
