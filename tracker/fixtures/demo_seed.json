@@ -1,0 +1,30 @@
+{
+    "habits": [
+        {"habit": "Drink Water", "periodicity": "daily"},
+        {"habit": "Morning Walk", "periodicity": "daily"},
+        {"habit": "Read Book", "periodicity": "weekly"},
+        {"habit": "Meditate", "periodicity": "daily"},
+        {"habit": "Exercise", "periodicity": "weekly"}
+    ],
+    "start_date": "2025-07-07",
+    "days": 28,
+    "moods": {
+        "pattern_scores": [3, 2, 4, 3, 3, 2, 4],
+        "reflections": [
+            "Feeling good today.",
+            "A bit tired but managed to stay positive.",
+            "Had a productive day!",
+            "Feeling stressed, need to relax more.",
+            "Great day with friends!",
+            "Feeling a bit down, but hopeful.",
+            "Excited about upcoming plans!"
+        ]
+    },
+    "completions_pattern": {
+        "Drink Water": [1, 1, 1, 1, 1, 1, 1],
+        "Morning Walk": [1, 0, 1, 1, 0, 1, 1],
+        "Read Book": [1, 1, 1, 1, 1, 1, 1],
+        "Meditate": [0, 0, 0, 1, 0, 0, 0],
+        "Exercise": [0, 0, 1, 0, 0, 1, 0]
+    }
+}
