@@ -27,3 +27,5 @@ Pipfile.lock
 
 # Pytest report
 report.html
+.coverage
+htmlcov/

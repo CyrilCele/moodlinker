@@ -17,6 +17,7 @@ pyyaml = "*"
 pytest-django = "*"
 pytest-html = "*"
 pytest-mock = "*"
+pytest-cov = "*"
 
 [dev-packages]
 black = "*"

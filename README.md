@@ -109,6 +109,25 @@ Now visit: http://127.0.0.1:8000
 6. **Enable reminders** to get notified when motivation drops.
 7. **Export calendar** reminders via ICS feed.
 
+## Demo Data
+
+You can preload the app with **4 weeks of demo habits, mood entries, and completions**. This is useful for showing streak tracking, analytics, and persistence in action.
+
+Run the management command:
+
+```bash
+python manage.py load_demo_data --user admin --file tracker/fixtures/demo_seed.json
+```
+
+#### What it doess:
+
+- Seeds **5 predefined habits** (at least 1 daily + 1 weekly).
+- Inserts **28 days (4 weeks)** of mood entries and habit completion patterns.
+- Runs built-in analytics (list habits, streaks, correctness checks).
+- Demonstrates a **persistence round-trip**: load → modify → save → reload.
+- Ensures you have data ready to showcase the analytics dashboard immediately.
+  > ⚠️ Make sure the user (`--user`) exists before running. For example, the username I chose is `admin`, but any username of your choice will suffice. Just remember not to put `admin` if your username is different to mine.
+
 ## Testing
 
 Run unit and integration tests with
@@ -118,6 +137,51 @@ pytest
 ```
 
 ![pytest](./img/pytest.png)
+
+## Test Coverage
+
+To generate a **coverage report** in HTML format (see which lines are covered):
+
+```bash
+pytest --cov=tracker --cov-report=html
+```
+
+This will create an `html/` folder. <br>
+Open `htmlcov/index.html` in your browser to view the interactive coverage report.
+
+![Coverage Report](./img/coverage-report.png)
+
+#### Current Coverage Snapshot
+
+- **Overall Coverage**: 94%
+- **Highlights**:
+  - `tracker/models.py` - 99% (covers model constraints and strings reprs)
+  - `tracker/services.py` - 94% (covers streaks, summaries, AI suggestions)
+  - `tracker/tests/test_forms.py` - 97%
+  - `tracker/tests/test_serializers.py` - 99%
+  - Lower coverage: template filters/helpers (~30-65%)
+
+#### Test Coverage Mapping
+
+The following unit/integration tests cover key app functionality:
+
+- **Habit CRUD (Create/Edit/Delete):**
+  - `tests_forms.py` - ensures form validation (habit name uniqueness, 5-habit cap).
+  - `test_serializers.py` - validates API serializers for habit create/update.
+  - `views.py` tests - exercise Django views for habit creation and deletion.
+- **Mood CRUD:**
+  - `test_forms.py` - validates mood entry form (unique per day).
+  - `test_serializers.py` - covers serializer rules for moods.
+- **Analytics Functions (`tracker/services.py`):**
+  - `AnalyticsService.longest_streak()` - tested via habit completion sequences.
+  - `AnalyuticsService.summaries()`: - tested across daily/weekly/monthly views.
+  - `AISuggestionService.analyze_reflection()` - sentiment scoring tested with positive/negative/neutral text.
+    `AISuggestionService.suggest()` - end-to-end coverage using seeded mood entries and reflections.
+- **Management Command (Demo Data):**
+  - `load_demo_data` tested indirectly by verifying seeded habits, moods, and completions exist after command execution.
+- **Notes**:
+  - Areas needing improvement: template tag filters (`custom_filters.py`, `form_helpers.py`) currently have limited test coverage.
+  - Business-critical logic (models, services, analytics, API) is nearly fully covered.
 
 ## Project Structure
 

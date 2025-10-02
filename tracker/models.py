@@ -398,9 +398,12 @@ class HabitCompletion(models.Model):
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE)
-    date = models.DateField(auto_now_add=True)
+    date = models.DateField(default=timezone.now)
     completed = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ("user", "habit", "date")
         ordering = ["-date"]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.habit.habit} on {self.date}: {'Done' if self.completed else 'Not Done'}"

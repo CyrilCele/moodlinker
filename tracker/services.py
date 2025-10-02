@@ -1,4 +1,3 @@
-import yaml
 from collections import defaultdict
 from datetime import timedelta
 from statistics import mean
