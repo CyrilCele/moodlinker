@@ -36,12 +36,6 @@ from tracker.models import Habit, MoodEntry, HabitCompletion
 
 # Get the configured user model
 User = get_user_model()
-# if not User.objects.filter(username="admin").exists():
-#     User.object.create_user(
-#         username="admin",
-#         email="admin@exmaple.com",
-#         password="admin"
-#     )
 
 
 class Command(BaseCommand):
@@ -94,12 +88,6 @@ class Command(BaseCommand):
         """
         # Disconnect habit -> schedule signals to prevent side effects during bulk load.
         # The signals are reconnected in the finally block to ensure normal app behavior is restored.
-        # signals.post_delete.disconnect(
-        #     tracker_signals.on_habit_changed, sender=Habit
-        # )
-        # signals.post_save.disconnect(
-        #     tracker_signals.on_habit_changed, sender=Habit
-        # )
         signals_to_disconnect = [
             (signals.post_delete, tracker_signals.on_habit_changed, Habit),
             (signals.post_save, tracker_signals.on_habit_changed, Habit)
@@ -124,12 +112,6 @@ class Command(BaseCommand):
             # Validate the file path
             if not os.path.exists(path):
                 raise CommandError(f"Seed file not found: {path}")
-            # self.stderr.write(
-            #     self.style.ERROR(
-            #         f"User '{username}' does not exist."
-            #     )
-            # )
-            # return
 
             # Load JSON seed file
             with open(path, "r", encoding="utf-8") as fh:
@@ -393,9 +375,3 @@ class Command(BaseCommand):
                             f"Failed to reconnect signal {receiver} for {sender}"
                         )
                     )
-            # signals.post_delete.connect(
-            #     tracker_signals.on_habit_changed, sender=Habit
-            # )
-            # signals.post_save.connect(
-            #     tracker_signals.on_habit_changed, sender=Habit
-            # )
